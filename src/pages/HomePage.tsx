@@ -15,13 +15,22 @@ const cards = [
   `${process.env.PUBLIC_URL}/mock_gifs/mock_album_1.gif`,
   `${process.env.PUBLIC_URL}/mock_gifs/mock_album_2.gif`,
   `${process.env.PUBLIC_URL}/mock_gifs/mock_album_3.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_4.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_5.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_6.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_7.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_8.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_9.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_10.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_11.gif`,
+  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_12.gif`,
 ];
 
 const HomePage: React.FC = () => {
   return (
     <Container>
       <main>
-        <Container sx={{ py: 8 }} maxWidth='md'>
+        <Container sx={{ py: 8, paddingTop: '7%' }} maxWidth='md'>
           <Grid container spacing={4}>
             {cards.map((imgPath) => (
               <Grid item key={imgPath} xs={12} sm={6} md={4}>

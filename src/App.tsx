@@ -3,7 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 
 import Router from './functionalities/Router';
-import NavBar from './components/NavBar';
+import { NavBar } from './components/NavBar';
 import defaultTheme from './functionalities/Theme';
 
 const App: React.FC = () => {
