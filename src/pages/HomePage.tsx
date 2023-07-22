@@ -12,18 +12,18 @@ import Typography from '@mui/material/Typography';
 import { getFileBasename } from '../functionalities/Utils';
 
 const cards = [
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_1.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_2.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_3.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_4.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_5.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_6.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_7.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_8.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_9.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_10.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_11.gif`,
-  `${process.env.PUBLIC_URL}/mock_gifs/mock_album_12.gif`,
+  `/mock_gifs/mock_album_1.gif`,
+  `/mock_gifs/mock_album_2.gif`,
+  `/mock_gifs/mock_album_3.gif`,
+  `/mock_gifs/mock_album_4.gif`,
+  `/mock_gifs/mock_album_5.gif`,
+  `/mock_gifs/mock_album_6.gif`,
+  `/mock_gifs/mock_album_7.gif`,
+  `/mock_gifs/mock_album_8.gif`,
+  `/mock_gifs/mock_album_9.gif`,
+  `/mock_gifs/mock_album_10.gif`,
+  `/mock_gifs/mock_album_11.gif`,
+  `/mock_gifs/mock_album_12.gif`,
 ];
 
 const HomePage: React.FC = () => {
