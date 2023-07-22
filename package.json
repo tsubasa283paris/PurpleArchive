@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "netlify-cli": "^15.9.1",
     "prettier": "^3.0.0"
   }
 }
