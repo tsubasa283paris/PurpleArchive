@@ -1,3 +1,4 @@
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -7,7 +8,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Successfully Deployed <code>A React application</code> to Netlify with CircleCI
+          Gartic Phone最高！
         </p>
         <a
           className="App-link"
