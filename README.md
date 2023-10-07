@@ -12,7 +12,11 @@ Gartic PhoneのGIFをみんなで保存してみんなで閲覧・検索しよ�
    sudo apt update
    sudo apt install nodejs
    sudo apt install npm
+   npm install
    ```
+
+1. 環境変数の設定
+   - `REACT_APP_API_SERVER_HOST`：バックエンドサーバホスト。例：`https://purple-archive-server.onrender.com`
 
 1. このディレクトリでビルド・実行  
    （ホットリロードされるので試しに適当なソースをいじったりしてみよう）  

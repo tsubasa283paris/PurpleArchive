@@ -26,7 +26,7 @@ const cards = [
   `/mock_gifs/mock_album_12.gif`,
 ];
 
-const HomePage: React.FC = () => {
+const TopPage: React.FC = () => {
   return (
     <Container>
       <main>
@@ -83,4 +83,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default TopPage;

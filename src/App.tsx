@@ -11,7 +11,7 @@ const App: React.FC = () => {
     <React.Fragment>
       <ThemeProvider theme={defaultTheme}>
         <CssBaseline />
-        <NavBar />
+        {/* <NavBar /> */}
         <Router />
       </ThemeProvider>
     </React.Fragment>

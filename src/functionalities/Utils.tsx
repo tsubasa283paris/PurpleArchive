@@ -9,3 +9,7 @@ export function getFileBasename(path: string): string {
   }
   return fileBaseName;
 }
+
+export function getApiUrl(path: string): string {
+  return process.env.REACT_APP_API_SERVER_HOST + path;
+}
