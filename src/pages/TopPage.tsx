@@ -97,6 +97,14 @@ const TopPage: React.FC = () => {
         >
           {'Hello, ' + authInfo?.userInfo.displayName + ' !'}
         </Typography>
+        <Typography
+          variant='subtitle1'
+          align='center'
+          color='text.secondary'
+          component='p'
+        >
+          {'Fetched: ' + String(albumsTotalCount) + ' albums'}
+        </Typography>
       </Box>
       {/* End footer */}
     </Container>
