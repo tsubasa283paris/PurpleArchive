@@ -5,17 +5,14 @@ import {
   Alert,
   Box,
   Card,
-  CardContent,
-  CardHeader,
   CircularProgress,
   Container,
-  FormControl,
-  Paper,
   Snackbar,
 } from '@mui/material';
-import { login } from '../services/Auth';
+import { AuthContext, Login } from '../functionalities/AuthContext';
+import { ARS } from '../functionalities/ApiResponseStatus';
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<{}> = () => {
   const [username, setUsername] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [isLoginInProgress, setIsLoginInProgress] =
@@ -25,51 +22,44 @@ const LoginPage: React.FC = () => {
     React.useState<string>('');
   const [openSnackbar, setOpenSnackbar] = React.useState<boolean>(false);
 
+  const setAuthInfo = React.useContext(AuthContext).setAuthInfo;
+
+  const stopProgressBecauseOfError = (text: string) => {
+    setIsLoginInProgress(false);
+    setLoginErrorDetailsText(text);
+    setIsLoginError(true);
+    setOpenSnackbar(true);
+  };
+
   const handleSubmitLogin = () => {
     setIsLoginInProgress(true);
     setIsLoginError(false);
 
     if (username === '' || password === '') {
-      setIsLoginInProgress(false);
-      setLoginErrorDetailsText('ユーザ名とパスワードを入力してください。');
-      setIsLoginError(true);
-      setOpenSnackbar(true);
+      stopProgressBecauseOfError('ユーザ名とパスワードを入力してください。');
       return;
     }
 
-    login(username, password)
-      .then((response) => {
-        console.log(response);
-        setIsLoginInProgress(false);
-        setIsLoginError(false);
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response.status, error.response.data);
-          if (error.response.status === 401) {
-            setIsLoginInProgress(false);
-            setLoginErrorDetailsText(
-              'ユーザ名またはパスワードが誤っています。'
-            );
-            setIsLoginError(true);
-            setOpenSnackbar(true);
-            return;
-          }
-        } else if (error.request) {
-          console.log(error.request);
-          setIsLoginInProgress(false);
-          setLoginErrorDetailsText('サーバエラーが発生しました。');
-          setIsLoginError(true);
-          setOpenSnackbar(true);
-        } else {
-          console.log('Error', error.message);
-          setIsLoginInProgress(false);
-          setLoginErrorDetailsText('サーバエラーが発生しました。');
-          setIsLoginError(true);
-          setOpenSnackbar(true);
-        }
-        // console.log(error.config);
-      });
+    Login(username, password, setAuthInfo).then((status) => {
+      setIsLoginInProgress(false);
+      setIsLoginError(false);
+
+      switch (status) {
+        case ARS.ErrUnauthorized:
+          stopProgressBecauseOfError(
+            'ユーザ名またはパスワードが誤っています。'
+          );
+          break;
+        case ARS.ErrServerSide:
+          stopProgressBecauseOfError('サーバエラーが発生しました。');
+          break;
+        case ARS.ErrRequest:
+          stopProgressBecauseOfError('サーバエラーが発生しました。');
+          break;
+        default:
+          break;
+      }
+    });
   };
 
   const handleCloseSnackbar = (

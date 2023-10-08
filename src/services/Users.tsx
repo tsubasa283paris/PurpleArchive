@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import authHeader from './Auth';
 import { getApiUrl } from '../functionalities/Utils';
+import { authHeader } from '../functionalities/AuthContext';
 
-interface UserInfo {
+export interface GetUserMeResp {
   id: string;
   displayName: string;
   createdAt: string;
@@ -11,5 +11,7 @@ interface UserInfo {
 }
 
 export const getUserMe = () => {
-  return axios.get<UserInfo>(getApiUrl('/users/me'), { headers: authHeader() });
+  return axios.get<GetUserMeResp>(getApiUrl('/users/me'), {
+    headers: authHeader(),
+  });
 };
