@@ -12,7 +12,11 @@ Gartic PhoneのGIFをみんなで保存してみんなで閲覧・検索しよ�
    sudo apt update
    sudo apt install nodejs
    sudo apt install npm
+   npm install
    ```
+
+1. 環境変数の設定
+   - `REACT_APP_API_SERVER_HOST`：バックエンドサーバホスト。例：`https://purple-archive-server.onrender.com`
 
 1. このディレクトリでビルド・実行  
    （ホットリロードされるので試しに適当なソースをいじったりしてみよう）  
@@ -29,8 +33,10 @@ Gartic PhoneのGIFをみんなで保存してみんなで閲覧・検索しよ�
 1. 当リポジトリを開いた状態で、VSCodeの設定（`Ctrl + ,`）を開き、`Workspace` タブを選択した状態で画面右上の「Open Settings (JSON)」を押下する。  
    開かれたJSONファイルに以下の項目を追加する。  
    ```json
-   "[typescript]": {
+   "[typescriptreact]": {
        "editor.defaultFormatter": "esbenp.prettier-vscode",
-       "editor.formatOnSave": true
+       "editor.formatOnSave": true,
+       "editor.tabSize": 2,
+       "editor.detectIndentation": false
    }
    ```
