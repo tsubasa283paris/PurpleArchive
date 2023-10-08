@@ -5,7 +5,6 @@ import {
   CardActions,
   CardContent,
   CardMedia,
-  Container,
   Typography,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -14,8 +13,6 @@ import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import { formatPlayedAt } from '../functionalities/Utils';
-import { AlbumOutlines } from '../services/Albums';
-import React from 'react';
 
 interface AlbumCardProps {
   thumbSource: string;
@@ -81,10 +78,10 @@ export const AlbumCard = (props: AlbumCardProps) => {
       <CardActions
         sx={{ display: 'flex', borderTop: 1, borderColor: 'grey.300' }}
       >
-        <Button size='medium' sx={{ flexGrow: 1 }}>
+        <Button size='medium' aria-label='add to bookmark' sx={{ flexGrow: 1 }}>
           {props.isBookmarked ? <StarIcon /> : <StarBorderOutlinedIcon />}
         </Button>
-        <Button size='medium' sx={{ flexGrow: 1 }}>
+        <Button size='medium' aria-label='download' sx={{ flexGrow: 1 }}>
           <DownloadIcon />
         </Button>
       </CardActions>
