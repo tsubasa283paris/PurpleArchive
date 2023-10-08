@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: NPM の更新
-          command: "sudo npm install -g npm"
+          command: "sudo npm install -g npm@8.5.0"
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
