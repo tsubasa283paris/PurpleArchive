@@ -4,6 +4,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import {
+  Badge,
   Button,
   CircularProgress,
   Divider,
@@ -26,6 +27,10 @@ import { AlbumOutlines, getAlbums } from '../services/Albums';
 import { ARS } from '../functionalities/ApiResponseStatus';
 import { AlbumCard } from '../components/AlbumCard';
 import { drawerWidth } from '../components/Drawer';
+import AlbumFilterDialog, {
+  AlbumFilter,
+} from '../components/AlbumFilterDialog';
+import { Gamemode, getGamemodes } from '../services/Gamemodes';
 
 interface SortMode {
   orderBy:
@@ -90,9 +95,38 @@ const TopPage: React.FC = () => {
   const [albumsTotalCount, setAlbumsTotalCount] = React.useState<number>(0);
   const [isAlbumsLoading, setIsAlbumLoading] = React.useState<boolean>(false);
   const [sortModeIndex, setSortModeIndex] = React.useState<number>(0);
+  const [openFilterDialog, setOpenFilterDialog] =
+    React.useState<boolean>(false);
+  const [gamemodeList, setGamemodeList] = React.useState<Gamemode[]>([]);
+
+  // album filters
+  const [partialDescription, setPartialDescription] = React.useState<
+    string | null
+  >(null);
+  const [partialPlayerName, setPartialPlayerName] = React.useState<
+    string | null
+  >(null);
+  const [playedFrom, setPlayedFrom] = React.useState<Date | null>(null);
+  const [playedUntil, setPlayedUntil] = React.useState<Date | null>(null);
+  const [gamemodeId, setGamemodeId] = React.useState<number | null>(null);
+  const [partialTag, setPartialTag] = React.useState<string | null>(null);
 
   const authInfo = useAuthInfo();
   const setAuthInfo = useSetAuthInfo();
+
+  const handleCloseFilterDialog = () => {
+    setOpenFilterDialog(false);
+  };
+
+  const handleSaveCloseFilterDialog = (albumFilter: AlbumFilter) => {
+    setOpenFilterDialog(false);
+    setPartialDescription(albumFilter.partialDescription);
+    setPartialPlayerName(albumFilter.partialPlayerName);
+    setPlayedFrom(albumFilter.playedFrom);
+    setPlayedUntil(albumFilter.playedUntil);
+    setGamemodeId(albumFilter.gamemodeId);
+    setPartialTag(albumFilter.partialTag);
+  };
 
   const handleSelectSortMode = (event: SelectChangeEvent) => {
     const sortModeIndex = Number(event.target.value);
@@ -106,9 +140,18 @@ const TopPage: React.FC = () => {
     return getAlbums({
       orderBy: sortMode.orderBy,
       order: sortMode.order,
+      ...(partialDescription && { partialDescription: partialDescription }),
+      ...(partialPlayerName && { partialPlayerName: partialPlayerName }),
+      ...(playedFrom && { playedFrom: playedFrom.getTime() / 1000 }),
+      ...(playedUntil && { playedUntil: playedUntil.getTime() / 1000 }),
+      ...(gamemodeId && { gamemodeId: gamemodeId }),
+      ...(partialTag && { partialTag: partialTag }),
     })
       .then((response) => {
         // update albums
+        if (response.data.albums === undefined) {
+          throw Error('empty albums');
+        }
         setAlbums(response.data.albums);
         setAlbumsTotalCount(response.data.albumsCountAll);
         console.log('successfully fetched and updated albums');
@@ -118,7 +161,27 @@ const TopPage: React.FC = () => {
       .catch((error) => {
         console.log(error);
         setIsAlbumLoading(false);
-        if (error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
+          LogoutExpired(setAuthInfo);
+        }
+        return ARS.ErrServerSide;
+      });
+  };
+
+  const loadGamemodes = () => {
+    return getGamemodes()
+      .then((response) => {
+        // update gamemodes
+        if (response.data.gamemodes === undefined) {
+          throw Error('empty gamemodes');
+        }
+        setGamemodeList(response.data.gamemodes);
+        console.log('successfully fetched and updated gamemodes');
+        return ARS.Ok;
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
           LogoutExpired(setAuthInfo);
         }
         return ARS.ErrServerSide;
@@ -126,20 +189,48 @@ const TopPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    loadAlbums(0);
-  }, []);
+    loadAlbums(sortModeIndex).then(() => {
+      loadGamemodes();
+    });
+  }, [
+    partialDescription,
+    partialPlayerName,
+    playedFrom,
+    playedUntil,
+    gamemodeId,
+    partialTag,
+  ]);
 
   return (
     <React.Fragment>
       <main>
-        <Container sx={{ maxWidth: `calc(100% - ${drawerWidth}px)` }}>
+        <Container
+          maxWidth='md'
+          sx={{ width: `calc(100% - ${drawerWidth}px)` }}
+        >
           <Toolbar />
           <Box sx={{ display: 'flex', py: '1em', height: 80 }}>
             <Box sx={{ width: '40%', display: 'flex' }}>
-              <IconButton sx={{ width: 40, height: 40, my: 'auto' }}>
-                <FilterListIcon />
+              <IconButton
+                onClick={() => {
+                  setOpenFilterDialog(true);
+                }}
+                sx={{ width: 40, height: 40, my: 'auto' }}
+              >
+                <Badge
+                  badgeContent={
+                    Number(partialDescription !== null) +
+                    Number(partialPlayerName !== null) +
+                    Number(playedFrom !== null || playedUntil !== null) +
+                    Number(gamemodeId !== null) +
+                    Number(partialTag !== null)
+                  }
+                  color='primary'
+                >
+                  <FilterListIcon />
+                </Badge>
               </IconButton>
-              <Typography sx={{ my: 'auto' }}>フィルター</Typography>
+              <Typography sx={{ my: 'auto' }}>フィルタ</Typography>
             </Box>
             <Box sx={{ width: '60%', display: 'flex' }}>
               <FormControl sx={{ width: '50%' }}>
@@ -186,30 +277,42 @@ const TopPage: React.FC = () => {
             </Grid>
           )}
         </Container>
+        <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
+          <Typography variant='h6' align='center' gutterBottom>
+            Purple Archive
+          </Typography>
+          <Typography
+            variant='subtitle1'
+            align='center'
+            color='text.secondary'
+            component='p'
+          >
+            {'Hello, ' + authInfo?.userInfo.displayName + ' !'}
+          </Typography>
+          <Typography
+            variant='subtitle1'
+            align='center'
+            color='text.secondary'
+            component='p'
+          >
+            {'Fetched: ' + String(albumsTotalCount) + ' albums'}
+          </Typography>
+        </Box>
+        <AlbumFilterDialog
+          open={openFilterDialog}
+          gamemodeList={gamemodeList}
+          albumFilter={{
+            partialDescription: null,
+            partialPlayerName: null,
+            playedFrom: null,
+            playedUntil: null,
+            gamemodeId: null,
+            partialTag: null,
+          }}
+          onClose={handleCloseFilterDialog}
+          onSaveClose={handleSaveCloseFilterDialog}
+        />
       </main>
-      {/* Footer */}
-      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
-        <Typography variant='h6' align='center' gutterBottom>
-          Purple Archive
-        </Typography>
-        <Typography
-          variant='subtitle1'
-          align='center'
-          color='text.secondary'
-          component='p'
-        >
-          {'Hello, ' + authInfo?.userInfo.displayName + ' !'}
-        </Typography>
-        <Typography
-          variant='subtitle1'
-          align='center'
-          color='text.secondary'
-          component='p'
-        >
-          {'Fetched: ' + String(albumsTotalCount) + ' albums'}
-        </Typography>
-      </Box>
-      {/* End footer */}
     </React.Fragment>
   );
 };

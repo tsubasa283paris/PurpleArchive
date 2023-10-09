@@ -37,6 +37,7 @@ export interface GetAlbumsParams {
 }
 
 export const getAlbums = (params: GetAlbumsParams) => {
+  console.log(params);
   return axios.get<GetAlbumsResp>(getApiUrl('/albums'), {
     headers: authHeader(),
     params: params,
