@@ -15,7 +15,7 @@ import PersonIcon from '@mui/icons-material/Person';
 export const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
-  width: 240,
+  width: drawerWidth,
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
