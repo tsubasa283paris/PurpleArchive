@@ -73,6 +73,15 @@ const LoginPage: React.FC<{}> = () => {
     setOpenSnackbar(false);
   };
 
+  React.useEffect(() => {
+    if (localStorage.getItem('authToken') === 'expired') {
+      setLoginErrorDetailsText(
+        'セッション期限が切れました。再ログインしてください。'
+      );
+      setOpenSnackbar(true);
+    }
+  }, []);
+
   return (
     <Container>
       <Card

@@ -49,6 +49,8 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({
       })
       .catch((error) => {
         console.log(error);
+        Logout(setAuthInfo);
+        setIsUserInfoLoading(false);
       });
   }, []);
 
@@ -127,6 +129,13 @@ export const Logout = (
   setAuthInfo: React.Dispatch<React.SetStateAction<AuthInfo | null>>
 ) => {
   localStorage.removeItem('authToken');
+  setAuthInfo(null);
+};
+
+export const LogoutExpired = (
+  setAuthInfo: React.Dispatch<React.SetStateAction<AuthInfo | null>>
+) => {
+  localStorage.setItem('authToken', 'expired');
   setAuthInfo(null);
 };
 

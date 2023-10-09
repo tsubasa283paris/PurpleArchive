@@ -61,8 +61,11 @@ const DrawerProxy = styled(MuiDrawer, {
   }),
 }));
 
+export type LocationLiteral = 'top' | 'mypage';
+
 interface DrawerProps {
   open: boolean;
+  location: LocationLiteral;
   onClickCloseDrawer: () => void;
   onClickJumpBrowse: () => void;
   onClickJumpMyPage: () => void;
@@ -95,6 +98,7 @@ export const Drawer = (props: DrawerProps) => {
               px: 2.5,
             }}
             onClick={props.onClickJumpBrowse}
+            selected={props.location === 'top'}
           >
             <ListItemIcon
               sx={{
@@ -119,6 +123,7 @@ export const Drawer = (props: DrawerProps) => {
               px: 2.5,
             }}
             onClick={props.onClickJumpMyPage}
+            selected={props.location === 'mypage'}
           >
             <ListItemIcon
               sx={{

@@ -3,11 +3,15 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { CircularProgress } from '@mui/material';
 
-import { useAuthInfo } from '../functionalities/AuthContext';
+import {
+  LogoutExpired,
+  useAuthInfo,
+  useSetAuthInfo,
+} from '../functionalities/AuthContext';
 import { AlbumOutlines, getAlbums } from '../services/Albums';
 import { ARS } from '../functionalities/ApiResponseStatus';
-import { CircularProgress } from '@mui/material';
 import { AlbumCard } from '../components/AlbumCard';
 
 const TopPage: React.FC = () => {
@@ -16,6 +20,7 @@ const TopPage: React.FC = () => {
   const [isAlbumsLoading, setIsAlbumLoading] = React.useState<boolean>(false);
 
   const authInfo = useAuthInfo();
+  const setAuthInfo = useSetAuthInfo();
 
   const loadResources = () => {
     return getAlbums({})
@@ -24,22 +29,25 @@ const TopPage: React.FC = () => {
         setAlbums(response.data.albums);
         setAlbumsTotalCount(response.data.albumsCountAll);
         console.log('successfully fetched and updated albums');
+        setIsAlbumLoading(false);
         return ARS.Ok;
       })
       .catch((error) => {
         console.log(error);
+        setIsAlbumLoading(false);
+        if (error.response.status === 401) {
+          LogoutExpired(setAuthInfo);
+        }
         return ARS.ErrServerSide;
       });
   };
 
   React.useEffect(() => {
-    loadResources().then((status) => {
-      setIsAlbumLoading(false);
-    });
+    loadResources();
   }, []);
 
   return (
-    <Container>
+    <React.Fragment>
       <main>
         {isAlbumsLoading ? (
           <CircularProgress size='1.5em' />
@@ -87,7 +95,7 @@ const TopPage: React.FC = () => {
         </Typography>
       </Box>
       {/* End footer */}
-    </Container>
+    </React.Fragment>
   );
 };
 
