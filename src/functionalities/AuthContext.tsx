@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { Dispatch, SetStateAction } from 'react';
+import { Box, CircularProgress } from '@mui/material';
 
 import { GetUserMeResp, getUserMe } from '../services/Users';
 import { getApiUrl } from '../functionalities/Utils';
@@ -24,10 +25,44 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [authInfo, setAuthInfo] = React.useState<AuthInfo | null>(null);
+  const [isUserInfoLoading, setIsUserInfoLoading] =
+    React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+
+    if (authToken === null) {
+      return;
+    }
+
+    // fetch user data
+    setIsUserInfoLoading(true);
+    getUserMe()
+      .then((response) => {
+        // finally store authToken and userInfo then return OK
+        setAuthInfo({
+          authToken: authToken,
+          userInfo: response.data,
+        });
+        console.log('successfully updated authToken');
+        setIsUserInfoLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        Logout(setAuthInfo);
+        setIsUserInfoLoading(false);
+      });
+  }, []);
 
   return (
     <AuthContext.Provider value={{ authInfo, setAuthInfo }}>
-      {children}
+      {isUserInfoLoading ? (
+        <Box sx={{ display: 'grid', placeItems: 'center', height: '100vh' }}>
+          <CircularProgress size={'5em'} />
+        </Box>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
@@ -94,6 +129,13 @@ export const Logout = (
   setAuthInfo: React.Dispatch<React.SetStateAction<AuthInfo | null>>
 ) => {
   localStorage.removeItem('authToken');
+  setAuthInfo(null);
+};
+
+export const LogoutExpired = (
+  setAuthInfo: React.Dispatch<React.SetStateAction<AuthInfo | null>>
+) => {
+  localStorage.setItem('authToken', 'expired');
   setAuthInfo(null);
 };
 
