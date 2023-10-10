@@ -137,12 +137,35 @@ const TopPage: React.FC = () => {
     setPlayedUntil(albumFilter.playedUntil);
     setGamemodeId(albumFilter.gamemodeId);
     setPartialTag(albumFilter.partialTag);
+
+    // also save them to localStorage
+    localStorage.setItem(
+      'albumsFilterPD',
+      albumFilter.partialDescription ?? ''
+    );
+    localStorage.setItem('albumsFilterPP', albumFilter.partialPlayerName ?? '');
+    localStorage.setItem(
+      'albumsFilterPF',
+      albumFilter.playedFrom ? albumFilter.playedFrom.toISOString() : ''
+    );
+    localStorage.setItem(
+      'albumsFilterPU',
+      albumFilter.playedUntil ? albumFilter.playedUntil.toISOString() : ''
+    );
+    localStorage.setItem(
+      'albumsFilterGI',
+      albumFilter.gamemodeId ? String(albumFilter.gamemodeId) : ''
+    );
+    localStorage.setItem('albumsFilterPT', albumFilter.partialTag ?? '');
   };
 
   const handleSelectSortMode = (event: SelectChangeEvent) => {
     const tempSortModeIndex = Number(event.target.value);
     setSortModeIndex(tempSortModeIndex);
     loadAlbums(tempSortModeIndex);
+
+    // also save it to localStorage
+    localStorage.setItem('albumsSortOrder', String(tempSortModeIndex));
   };
 
   const handlePressBookmark = (albumId: number, isBookmarked: boolean) => {
@@ -285,6 +308,38 @@ const TopPage: React.FC = () => {
     gamemodeId,
     partialTag,
   ]);
+
+  React.useEffect(() => {
+    // load filters and sort order once
+    const pd = localStorage.getItem('albumsFilterPD');
+    const pp = localStorage.getItem('albumsFilterPP');
+    const pf = localStorage.getItem('albumsFilterPF');
+    const pu = localStorage.getItem('albumsFilterPU');
+    const gi = localStorage.getItem('albumsFilterGI');
+    const pt = localStorage.getItem('albumsFilterPT');
+    const so = localStorage.getItem('albumsSortOrder');
+    if (pd !== null && pd.length > 0) {
+      setPartialDescription(pd);
+    }
+    if (pp !== null && pp.length > 0) {
+      setPartialPlayerName(pp);
+    }
+    if (pf !== null && pf.length > 0) {
+      setPlayedFrom(new Date(pf));
+    }
+    if (pu !== null && pu.length > 0) {
+      setPlayedUntil(new Date(pu));
+    }
+    if (gi !== null && gi.length > 0) {
+      setGamemodeId(Number(gi));
+    }
+    if (pt !== null && pt.length > 0) {
+      setPartialTag(pt);
+    }
+    if (so !== null) {
+      setSortModeIndex(Number(so));
+    }
+  }, []);
 
   return (
     <React.Fragment>
