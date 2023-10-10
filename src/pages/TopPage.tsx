@@ -109,6 +109,7 @@ const TopPage: React.FC = () => {
   const [openFilterDialog, setOpenFilterDialog] =
     React.useState<boolean>(false);
   const [gamemodeList, setGamemodeList] = React.useState<Gamemode[]>([]);
+  const [mounted, setMounted] = React.useState<boolean>(false);
 
   // album filters
   const [partialDescription, setPartialDescription] = React.useState<
@@ -162,7 +163,6 @@ const TopPage: React.FC = () => {
   const handleSelectSortMode = (event: SelectChangeEvent) => {
     const tempSortModeIndex = Number(event.target.value);
     setSortModeIndex(tempSortModeIndex);
-    loadAlbums(tempSortModeIndex);
 
     // also save it to localStorage
     localStorage.setItem('albumsSortOrder', String(tempSortModeIndex));
@@ -232,19 +232,13 @@ const TopPage: React.FC = () => {
     value: number
   ) => {
     setPage(value - 1);
-    loadAlbums(sortModeIndex, value - 1);
   };
 
-  const loadAlbums = (
-    sortModeIndex_: number | null = null,
-    page_: number | null = null
-  ) => {
-    const sortMode =
-      sortModeList[sortModeIndex_ === null ? sortModeIndex : sortModeIndex_]
-        .sortMode;
+  const loadAlbums = () => {
+    const sortMode = sortModeList[sortModeIndex].sortMode;
     setIsAlbumLoading(true);
     return getAlbums({
-      offset: (page_ === null ? page : page_) * albumsPerPage,
+      offset: page * albumsPerPage,
       limit: albumsPerPage,
       orderBy: sortMode.orderBy,
       order: sortMode.order,
@@ -297,9 +291,11 @@ const TopPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    loadAlbums().then(() => {
-      loadGamemodes();
-    });
+    if (mounted) {
+      loadAlbums().then(() => {
+        loadGamemodes();
+      });
+    }
   }, [
     partialDescription,
     partialPlayerName,
@@ -307,37 +303,45 @@ const TopPage: React.FC = () => {
     playedUntil,
     gamemodeId,
     partialTag,
+    sortModeIndex,
+    page,
   ]);
 
   React.useEffect(() => {
-    // load filters and sort order once
-    const pd = localStorage.getItem('albumsFilterPD');
-    const pp = localStorage.getItem('albumsFilterPP');
-    const pf = localStorage.getItem('albumsFilterPF');
-    const pu = localStorage.getItem('albumsFilterPU');
-    const gi = localStorage.getItem('albumsFilterGI');
-    const pt = localStorage.getItem('albumsFilterPT');
-    const so = localStorage.getItem('albumsSortOrder');
-    if (pd !== null && pd.length > 0) {
-      setPartialDescription(pd);
-    }
-    if (pp !== null && pp.length > 0) {
-      setPartialPlayerName(pp);
-    }
-    if (pf !== null && pf.length > 0) {
-      setPlayedFrom(new Date(pf));
-    }
-    if (pu !== null && pu.length > 0) {
-      setPlayedUntil(new Date(pu));
-    }
-    if (gi !== null && gi.length > 0) {
-      setGamemodeId(Number(gi));
-    }
-    if (pt !== null && pt.length > 0) {
-      setPartialTag(pt);
-    }
-    if (so !== null) {
-      setSortModeIndex(Number(so));
+    if (!mounted) {
+      // load filters and sort order once
+      const pd = localStorage.getItem('albumsFilterPD');
+      const pp = localStorage.getItem('albumsFilterPP');
+      const pf = localStorage.getItem('albumsFilterPF');
+      const pu = localStorage.getItem('albumsFilterPU');
+      const gi = localStorage.getItem('albumsFilterGI');
+      const pt = localStorage.getItem('albumsFilterPT');
+      const so = localStorage.getItem('albumsSortOrder');
+      if (pd !== null && pd.length > 0) {
+        setPartialDescription(pd);
+      }
+      if (pp !== null && pp.length > 0) {
+        setPartialPlayerName(pp);
+      }
+      if (pf !== null && pf.length > 0) {
+        setPlayedFrom(new Date(pf));
+      }
+      if (pu !== null && pu.length > 0) {
+        setPlayedUntil(new Date(pu));
+      }
+      if (gi !== null && gi.length > 0) {
+        setGamemodeId(Number(gi));
+      }
+      if (pt !== null && pt.length > 0) {
+        setPartialTag(pt);
+      }
+      if (so !== null) {
+        setSortModeIndex(Number(so));
+      }
+      console.log(
+        'successfully loaded filters and sort order from localStorage'
+      );
+      setMounted(true);
     }
   }, []);
 
@@ -380,7 +384,7 @@ const TopPage: React.FC = () => {
                   sx={{ height: '100%' }}
                 >
                   {sortModeList.map((sortMode, i) => (
-                    <MenuItem value={String(i)}>
+                    <MenuItem value={String(i)} key={String(i)}>
                       {sortMode.displayText}
                     </MenuItem>
                   ))}
@@ -462,12 +466,12 @@ const TopPage: React.FC = () => {
           open={openFilterDialog}
           gamemodeList={gamemodeList}
           albumFilter={{
-            partialDescription: null,
-            partialPlayerName: null,
-            playedFrom: null,
-            playedUntil: null,
-            gamemodeId: null,
-            partialTag: null,
+            partialDescription: partialDescription,
+            partialPlayerName: partialPlayerName,
+            playedFrom: playedFrom,
+            playedUntil: playedUntil,
+            gamemodeId: gamemodeId,
+            partialTag: partialTag,
           }}
           onClose={handleCloseFilterDialog}
           onSaveClose={handleSaveCloseFilterDialog}

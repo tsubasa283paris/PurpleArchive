@@ -75,6 +75,17 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
     });
   };
 
+  React.useEffect(() => {
+    if (open) {
+      setPartialDescription(albumFilter.partialDescription ?? '');
+      setPartialPlayerName(albumFilter.partialPlayerName ?? '');
+      setPlayedFrom(albumFilter.playedFrom);
+      setPlayedUntil(albumFilter.playedUntil);
+      setGamemodeId(albumFilter.gamemodeId);
+      setPartialTag(albumFilter.partialTag ?? '');
+    }
+  }, [open]);
+
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle sx={{ display: 'flex' }}>
@@ -271,9 +282,13 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
                   }
                 }}
               >
-                <MenuItem value={'null'}>すべて</MenuItem>
+                <MenuItem value={'null'} key={'null'}>
+                  すべて
+                </MenuItem>
                 {gamemodeList.map((gamemode, i) => (
-                  <MenuItem value={String(i)}>{gamemode.name}</MenuItem>
+                  <MenuItem value={String(i)} key={String(i)}>
+                    {gamemode.name}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
