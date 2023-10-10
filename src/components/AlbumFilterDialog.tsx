@@ -1,10 +1,12 @@
 import * as React from 'react';
+import { useDebounce } from 'react-use';
 import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import {
   Badge,
   Box,
+  CircularProgress,
   Divider,
   FormControl,
   IconButton,
@@ -18,9 +20,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { Gamemode } from '../services/Gamemodes';
-import dayjs, { Dayjs } from 'dayjs';
+import { Tag, getTags } from '../services/Tags';
+import { LogoutExpired, useSetAuthInfo } from '../functionalities/AuthContext';
 
 export interface AlbumFilter {
   partialDescription: string | null;
@@ -59,6 +63,13 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
   const [partialTag, setPartialTag] = React.useState<string>(
     albumFilter.partialTag ?? ''
   );
+  const [isSuggestTagsLoading, setIsSuggestTagsLoading] =
+    React.useState<boolean>(false);
+  const [suggestTags, setSuggestTags] = React.useState<Tag[]>([]);
+  const [preventSuggestTags, setPreventSuggestTags] =
+    React.useState<boolean>(false);
+
+  const setAuthInfo = useSetAuthInfo();
 
   const handleClose = () => {
     onClose();
@@ -74,6 +85,39 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
       partialTag: partialTag.length ? partialTag : null,
     });
   };
+
+  const handleInputPartialTag = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPreventSuggestTags(false);
+    setPartialTag(event.target.value);
+    if (event.target.value.length > 0) {
+      setIsSuggestTagsLoading(true);
+    }
+  };
+
+  useDebounce(
+    () => {
+      if (partialTag.length === 0 || preventSuggestTags) {
+        setIsSuggestTagsLoading(false);
+        return;
+      }
+      getTags({ partialName: partialTag, limit: 5 })
+        .then((response) => {
+          setSuggestTags(response.data.tags);
+          setIsSuggestTagsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsSuggestTagsLoading(false);
+          if (error.response && error.response.status === 401) {
+            LogoutExpired(setAuthInfo);
+          }
+        });
+    },
+    700,
+    [partialTag]
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -317,11 +361,43 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
               fullWidth
               size='small'
               value={partialTag}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setPartialTag(event.target.value);
-              }}
+              onChange={handleInputPartialTag}
               sx={{}}
             />
+          </Box>
+        </Box>
+        <Box sx={{ display: 'flex', my: '0.2em' }}>
+          <Box sx={{ flexGrow: 1, width: '45%', mx: '0.3em' }} />
+          <Box
+            sx={{ flexGrow: 1, width: '55%', mx: '0.3em', textAlign: 'center' }}
+          >
+            {isSuggestTagsLoading ? (
+              <CircularProgress size={'1em'} />
+            ) : (
+              partialTag.length > 0 && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {suggestTags.map((tag) => (
+                    <Button
+                      variant='contained'
+                      size='small'
+                      onClick={() => {
+                        setPartialTag(tag.name);
+                        setSuggestTags([]);
+                        setPreventSuggestTags(true);
+                      }}
+                      sx={{ borderRadius: 100, m: '0.1em' }}
+                    >
+                      {tag.name}
+                    </Button>
+                  ))}
+                </Box>
+              )
+            )}
           </Box>
         </Box>
         <Box sx={{ display: 'flex', my: '0.5em' }}>
