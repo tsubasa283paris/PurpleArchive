@@ -78,7 +78,7 @@ export const Drawer = (props: DrawerProps) => {
     <DrawerProxy variant='permanent' open={props.open}>
       <DrawerHeader>
         <Box sx={{ width: '100%', textAlign: 'center', paddingTop: '0.3em' }}>
-          <img src='logo192.png' height='40em' />
+          <img src='logo192.png' alt='Purple Archive logo' height='40em' />
         </Box>
         <IconButton onClick={props.onClickCloseDrawer}>
           {theme.direction === 'rtl' ? (

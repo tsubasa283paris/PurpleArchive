@@ -9,7 +9,6 @@ import {
   CircularProgress,
   Divider,
   FormControl,
-  IconButton,
   MenuItem,
   Select,
   TextField,
@@ -120,15 +119,13 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
   );
 
   React.useEffect(() => {
-    if (open) {
-      setPartialDescription(albumFilter.partialDescription ?? '');
-      setPartialPlayerName(albumFilter.partialPlayerName ?? '');
-      setPlayedFrom(albumFilter.playedFrom);
-      setPlayedUntil(albumFilter.playedUntil);
-      setGamemodeId(albumFilter.gamemodeId);
-      setPartialTag(albumFilter.partialTag ?? '');
-    }
-  }, [open]);
+    setPartialDescription(albumFilter.partialDescription ?? '');
+    setPartialPlayerName(albumFilter.partialPlayerName ?? '');
+    setPlayedFrom(albumFilter.playedFrom);
+    setPlayedUntil(albumFilter.playedUntil);
+    setGamemodeId(albumFilter.gamemodeId);
+    setPartialTag(albumFilter.partialTag ?? '');
+  }, [albumFilter]);
 
   return (
     <Dialog onClose={handleClose} open={open}>
