@@ -15,14 +15,15 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { formatPlayedAt } from '../functionalities/Utils';
 
 interface AlbumCardProps {
+  albumId: number;
   thumbSource: string;
   playedAt: string;
   pvCount: number;
   bookmarkCount: number;
   downloadCount: number;
   isBookmarked: boolean;
-  handlePressBookmark: any;
-  handlePressDownload: any;
+  handlePressBookmark: (albumId: number, isBookmarked: boolean) => void;
+  handlePressDownload: (albumId: number) => void;
 }
 
 export const AlbumCard = (props: AlbumCardProps) => {
@@ -50,26 +51,29 @@ export const AlbumCard = (props: AlbumCardProps) => {
           flexDirection: 'column',
         }}
       >
-        <Typography variant='h6'>
+        <Typography variant='body1'>
           {formatPlayedAt(new Date(props.playedAt))}
         </Typography>
         <Box sx={{ height: '0.3em' }} />
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <VisibilityIcon sx={{ flexGrow: 1 }} />
-            <Typography sx={{ flexGrow: 3 }}>
+            <VisibilityIcon
+              fontSize='small'
+              sx={{ mt: '0.1em', flexGrow: 1 }}
+            />
+            <Typography variant='body1' sx={{ flexGrow: 3 }}>
               {String(props.pvCount)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <StarIcon sx={{ flexGrow: 1 }} />
-            <Typography sx={{ flexGrow: 3 }}>
+            <StarIcon fontSize='small' sx={{ mt: '0.1em', flexGrow: 1 }} />
+            <Typography variant='body1' sx={{ flexGrow: 3 }}>
               {String(props.bookmarkCount)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <DownloadIcon sx={{ flexGrow: 1 }} />
-            <Typography sx={{ flexGrow: 3 }}>
+            <DownloadIcon fontSize='small' sx={{ mt: '0.1em', flexGrow: 1 }} />
+            <Typography variant='body1' sx={{ flexGrow: 3 }}>
               {String(props.downloadCount)}
             </Typography>
           </Box>
@@ -78,10 +82,24 @@ export const AlbumCard = (props: AlbumCardProps) => {
       <CardActions
         sx={{ display: 'flex', borderTop: 1, borderColor: 'grey.300' }}
       >
-        <Button size='medium' aria-label='add to bookmark' sx={{ flexGrow: 1 }}>
+        <Button
+          size='small'
+          aria-label='add to bookmark'
+          onClick={() => {
+            props.handlePressBookmark(props.albumId, props.isBookmarked);
+          }}
+          sx={{ flexGrow: 1 }}
+        >
           {props.isBookmarked ? <StarIcon /> : <StarBorderOutlinedIcon />}
         </Button>
-        <Button size='medium' aria-label='download' sx={{ flexGrow: 1 }}>
+        <Button
+          size='small'
+          aria-label='download'
+          onClick={() => {
+            props.handlePressDownload(props.albumId);
+          }}
+          sx={{ flexGrow: 1 }}
+        >
           <DownloadIcon />
         </Button>
       </CardActions>

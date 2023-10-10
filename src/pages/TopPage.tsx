@@ -23,7 +23,13 @@ import {
   useAuthInfo,
   useSetAuthInfo,
 } from '../functionalities/AuthContext';
-import { AlbumOutlines, getAlbums } from '../services/Albums';
+import {
+  AlbumOutlines,
+  bookmarkOne,
+  getAlbums,
+  incrementDlCount,
+  unBookmarkOne,
+} from '../services/Albums';
 import { ARS } from '../functionalities/ApiResponseStatus';
 import { AlbumCard } from '../components/AlbumCard';
 import { drawerWidth } from '../components/Drawer';
@@ -31,6 +37,7 @@ import AlbumFilterDialog, {
   AlbumFilter,
 } from '../components/AlbumFilterDialog';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
+import { formatDate } from '../functionalities/Utils';
 
 interface SortMode {
   orderBy:
@@ -132,6 +139,65 @@ const TopPage: React.FC = () => {
     const sortModeIndex = Number(event.target.value);
     setSortModeIndex(sortModeIndex);
     loadAlbums(sortModeIndex);
+  };
+
+  const handlePressBookmark = (albumId: number, isBookmarked: boolean) => {
+    const p = isBookmarked ? unBookmarkOne(albumId) : bookmarkOne(albumId);
+    p.then(() => {
+      let tempAlbums: AlbumOutlines[] = [];
+      albums.forEach((album) => {
+        if (album.id === albumId) {
+          album.bookmarkCount += isBookmarked ? -1 : 1;
+          album.isBookmarked = !isBookmarked;
+        }
+        tempAlbums.push(album);
+      });
+      setAlbums(tempAlbums);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response && error.response.status === 401) {
+        LogoutExpired(setAuthInfo);
+      }
+    });
+  };
+
+  const handlePressDownload = (albumId: number) => {
+    incrementDlCount(albumId)
+      .then(() => {
+        // find target album
+        let fileName: string = '';
+        let fileHref: string = '';
+        let tempAlbums: AlbumOutlines[] = [];
+        albums.forEach((album) => {
+          if (album.id === albumId) {
+            // store file name and href
+            fileName =
+              'album_' +
+              formatDate(new Date(album.playedAt), 'yyyy-MM-dd_hh-mm-ss') +
+              '.gif';
+            fileHref = album.source;
+            // update download count
+            album.downloadCount += 1;
+          }
+          tempAlbums.push(album);
+        });
+        setAlbums(tempAlbums);
+        // make album downloaded
+        const link = document.createElement('a');
+        link.setAttribute('href', fileHref);
+        link.setAttribute('download', fileName);
+        /**
+         * @todo this 'download' update does not work. give users
+         *       GIF files with datetime in their name!
+         */
+        link.click();
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          LogoutExpired(setAuthInfo);
+        }
+      });
   };
 
   const loadAlbums = (sortModeIndex: number) => {
@@ -261,16 +327,17 @@ const TopPage: React.FC = () => {
           ) : (
             <Grid container spacing={4} sx={{ py: '1em' }}>
               {albums.map((album) => (
-                <Grid item key={album.thumbSource} xs={12} sm={6} md={4}>
+                <Grid item key={album.thumbSource} xs={8} sm={4} md={3}>
                   <AlbumCard
+                    albumId={album.id}
                     thumbSource={album.thumbSource}
                     playedAt={album.playedAt}
                     pvCount={album.pvCount}
                     bookmarkCount={album.bookmarkCount}
                     downloadCount={album.downloadCount}
                     isBookmarked={album.isBookmarked}
-                    handlePressBookmark={undefined}
-                    handlePressDownload={undefined}
+                    handlePressBookmark={handlePressBookmark}
+                    handlePressDownload={handlePressDownload}
                   />
                 </Grid>
               ))}

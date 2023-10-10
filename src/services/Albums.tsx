@@ -43,3 +43,37 @@ export const getAlbums = (params: GetAlbumsParams) => {
     params: params,
   });
 };
+
+export const bookmarkOne = (albumId: number) => {
+  return axios.post<any>(
+    getApiUrl('/users/me/bookmarks'),
+    {
+      albumIds: [albumId],
+    },
+    {
+      headers: authHeader(),
+    }
+  );
+};
+
+export const unBookmarkOne = (albumId: number) => {
+  return axios.post<any>(
+    getApiUrl('/users/me/bookmarks/unbookmark'),
+    {
+      albumIds: [albumId],
+    },
+    {
+      headers: authHeader(),
+    }
+  );
+};
+
+export const incrementDlCount = (albumId: number) => {
+  return axios.post<any>(
+    getApiUrl(`/albums/${albumId}/dlcount`),
+    {},
+    {
+      headers: authHeader(),
+    }
+  );
+};
