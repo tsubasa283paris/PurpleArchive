@@ -11,6 +11,7 @@ import {
   FormControl,
   IconButton,
   MenuItem,
+  Pagination,
   Select,
   SelectChangeEvent,
   Toolbar,
@@ -38,6 +39,8 @@ import AlbumFilterDialog, {
 } from '../components/AlbumFilterDialog';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
 import { formatDate } from '../functionalities/Utils';
+
+const albumsPerPage = 12;
 
 interface SortMode {
   orderBy:
@@ -100,6 +103,7 @@ const sortModeList: SortModeWithDisplayText[] = [
 const TopPage: React.FC = () => {
   const [albums, setAlbums] = React.useState<AlbumOutlines[]>([]);
   const [albumsTotalCount, setAlbumsTotalCount] = React.useState<number>(0);
+  const [page, setPage] = React.useState<number>(0);
   const [isAlbumsLoading, setIsAlbumLoading] = React.useState<boolean>(false);
   const [sortModeIndex, setSortModeIndex] = React.useState<number>(0);
   const [openFilterDialog, setOpenFilterDialog] =
@@ -136,9 +140,9 @@ const TopPage: React.FC = () => {
   };
 
   const handleSelectSortMode = (event: SelectChangeEvent) => {
-    const sortModeIndex = Number(event.target.value);
-    setSortModeIndex(sortModeIndex);
-    loadAlbums(sortModeIndex);
+    const tempSortModeIndex = Number(event.target.value);
+    setSortModeIndex(tempSortModeIndex);
+    loadAlbums(tempSortModeIndex);
   };
 
   const handlePressBookmark = (albumId: number, isBookmarked: boolean) => {
@@ -200,10 +204,25 @@ const TopPage: React.FC = () => {
       });
   };
 
-  const loadAlbums = (sortModeIndex: number) => {
-    const sortMode = sortModeList[sortModeIndex].sortMode;
+  const handleSelectPage = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value - 1);
+    loadAlbums(sortModeIndex, value - 1);
+  };
+
+  const loadAlbums = (
+    sortModeIndex_: number | null = null,
+    page_: number | null = null
+  ) => {
+    const sortMode =
+      sortModeList[sortModeIndex_ === null ? sortModeIndex : sortModeIndex_]
+        .sortMode;
     setIsAlbumLoading(true);
     return getAlbums({
+      offset: (page_ === null ? page : page_) * albumsPerPage,
+      limit: albumsPerPage,
       orderBy: sortMode.orderBy,
       order: sortMode.order,
       ...(partialDescription && { partialDescription: partialDescription }),
@@ -255,7 +274,7 @@ const TopPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    loadAlbums(sortModeIndex).then(() => {
+    loadAlbums().then(() => {
       loadGamemodes();
     });
   }, [
@@ -325,23 +344,42 @@ const TopPage: React.FC = () => {
               <CircularProgress size={'4em'} />
             </Box>
           ) : (
-            <Grid container spacing={4} sx={{ py: '1em' }}>
-              {albums.map((album) => (
-                <Grid item key={album.thumbSource} xs={8} sm={4} md={3}>
-                  <AlbumCard
-                    albumId={album.id}
-                    thumbSource={album.thumbSource}
-                    playedAt={album.playedAt}
-                    pvCount={album.pvCount}
-                    bookmarkCount={album.bookmarkCount}
-                    downloadCount={album.downloadCount}
-                    isBookmarked={album.isBookmarked}
-                    handlePressBookmark={handlePressBookmark}
-                    handlePressDownload={handlePressDownload}
-                  />
-                </Grid>
-              ))}
-            </Grid>
+            <React.Fragment>
+              <Box sx={{ height: '0.5em' }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box sx={{ minWidth: '50%' }} />
+                <Pagination
+                  count={Math.ceil(albumsTotalCount / albumsPerPage)}
+                  page={page + 1}
+                  onChange={handleSelectPage}
+                />
+              </Box>
+              <Grid container spacing={4} sx={{ py: '1em' }}>
+                {albums.map((album) => (
+                  <Grid item key={album.thumbSource} xs={8} sm={4} md={3}>
+                    <AlbumCard
+                      albumId={album.id}
+                      thumbSource={album.thumbSource}
+                      playedAt={album.playedAt}
+                      pvCount={album.pvCount}
+                      bookmarkCount={album.bookmarkCount}
+                      downloadCount={album.downloadCount}
+                      isBookmarked={album.isBookmarked}
+                      handlePressBookmark={handlePressBookmark}
+                      handlePressDownload={handlePressDownload}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box sx={{ minWidth: '50%' }} />
+                <Pagination
+                  count={Math.ceil(albumsTotalCount / albumsPerPage)}
+                  page={page + 1}
+                  onChange={handleSelectPage}
+                />
+              </Box>
+            </React.Fragment>
           )}
         </Container>
         <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
