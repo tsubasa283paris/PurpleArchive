@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { getApiUrl } from '../functionalities/Utils';
+import { blobToBase64, getApiUrl } from '../functionalities/Utils';
 import { authHeader } from '../functionalities/AuthContext';
 
 export interface AlbumOutlines {
@@ -76,4 +76,30 @@ export const incrementDlCount = (albumId: number) => {
       headers: authHeader(),
     }
   );
+};
+
+export interface PageMetaData {
+  description: string;
+  playerName: string;
+}
+
+export interface UploadTempAlbumResp {
+  temporaryAlbumUuid: string;
+  hashMatchResult: number | null;
+  pageMetaData: PageMetaData[];
+}
+
+export const uploadTempAlbum = (tempAlbum: File) => {
+  return blobToBase64(tempAlbum).then((b64) => {
+    console.log(b64);
+    return axios.post<UploadTempAlbumResp>(
+      getApiUrl('/albums/temp'),
+      {
+        data: b64,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
+  });
 };

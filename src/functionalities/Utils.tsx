@@ -37,3 +37,17 @@ export function formatDate(date: Date, format: string): string {
 export function formatPlayedAt(playedAt: Date): string {
   return formatDate(playedAt, 'yyyy/MM/dd hh:mm:ss');
 }
+
+export const blobToBase64 = (blob: Blob) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise<string>((resolve) => {
+    reader.onloadend = () => {
+      if (typeof reader.result !== 'string') {
+        resolve('');
+      } else {
+        resolve(reader.result.split(',')[1]);
+      }
+    };
+  });
+};

@@ -428,7 +428,7 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
         }}
       >
         <Box sx={{ flexGrow: 1 }} />
-        <Box sx={{ flexGrow: 1, maxWidth: '70%', display: 'flex' }}>
+        <Box sx={{ flexGrow: 1, maxWidth: 270, display: 'flex' }}>
           <Button
             onClick={handleClose}
             variant='outlined'

@@ -39,6 +39,7 @@ import AlbumFilterDialog, {
 } from '../components/AlbumFilterDialog';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
 import { formatDate } from '../functionalities/Utils';
+import AlbumUploadDialog from '../components/AlbumUploadDialog';
 
 const albumsPerPage = 12;
 
@@ -108,6 +109,8 @@ const TopPage: React.FC = () => {
   const [sortModeIndex, setSortModeIndex] = React.useState<number>(0);
   const [openFilterDialog, setOpenFilterDialog] =
     React.useState<boolean>(false);
+  const [openUploadDialog, setOpenUploadDialog] =
+    React.useState<boolean>(false);
   const [gamemodeList, setGamemodeList] = React.useState<Gamemode[]>([]);
   const [mounted, setMounted] = React.useState<boolean>(false);
 
@@ -158,6 +161,17 @@ const TopPage: React.FC = () => {
       albumFilter.gamemodeId ? String(albumFilter.gamemodeId) : ''
     );
     localStorage.setItem('albumsFilterPT', albumFilter.partialTag ?? '');
+  };
+
+  const handleCloseUploadDialog = () => {
+    setOpenUploadDialog(false);
+  };
+
+  const handleSaveCloseUploadDialog = () => {
+    setOpenUploadDialog(false);
+    loadAlbums().then(() => {
+      loadGamemodes();
+    });
   };
 
   const handleSelectSortMode = (event: SelectChangeEvent) => {
@@ -393,7 +407,13 @@ const TopPage: React.FC = () => {
                 </Select>
               </FormControl>
               <Box sx={{ width: '5%' }} />
-              <Button variant='contained' sx={{ width: '45%' }}>
+              <Button
+                variant='contained'
+                onClick={() => {
+                  setOpenUploadDialog(true);
+                }}
+                sx={{ width: '45%' }}
+              >
                 <UploadIcon color='inherit' />
                 アップロード
               </Button>
@@ -477,6 +497,11 @@ const TopPage: React.FC = () => {
           }}
           onClose={handleCloseFilterDialog}
           onSaveClose={handleSaveCloseFilterDialog}
+        />
+        <AlbumUploadDialog
+          open={openUploadDialog}
+          onClose={handleCloseUploadDialog}
+          onSaveClose={handleSaveCloseUploadDialog}
         />
       </main>
     </React.Fragment>
