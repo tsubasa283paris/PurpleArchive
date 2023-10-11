@@ -327,7 +327,10 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
                   すべて
                 </MenuItem>
                 {gamemodeList.map((gamemode, i) => (
-                  <MenuItem value={String(i)} key={String(i)}>
+                  <MenuItem
+                    value={String(gamemode.id)}
+                    key={String(gamemode.id)}
+                  >
                     {gamemode.name}
                   </MenuItem>
                 ))}

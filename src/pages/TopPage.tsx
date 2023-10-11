@@ -305,9 +305,11 @@ const TopPage: React.FC = () => {
     partialTag,
     sortModeIndex,
     page,
+    mounted,
   ]);
 
   React.useEffect(() => {
+    console.log('useEffect');
     if (!mounted) {
       // load filters and sort order once
       const pd = localStorage.getItem('albumsFilterPD');
