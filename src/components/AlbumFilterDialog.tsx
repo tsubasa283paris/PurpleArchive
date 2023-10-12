@@ -327,7 +327,10 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
                   すべて
                 </MenuItem>
                 {gamemodeList.map((gamemode, i) => (
-                  <MenuItem value={String(i)} key={String(i)}>
+                  <MenuItem
+                    value={String(gamemode.id)}
+                    key={String(gamemode.id)}
+                  >
                     {gamemode.name}
                   </MenuItem>
                 ))}
@@ -425,7 +428,7 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
         }}
       >
         <Box sx={{ flexGrow: 1 }} />
-        <Box sx={{ flexGrow: 1, maxWidth: '70%', display: 'flex' }}>
+        <Box sx={{ flexGrow: 1, maxWidth: 270, display: 'flex' }}>
           <Button
             onClick={handleClose}
             variant='outlined'

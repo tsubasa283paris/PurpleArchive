@@ -37,3 +37,76 @@ export function formatDate(date: Date, format: string): string {
 export function formatPlayedAt(playedAt: Date): string {
   return formatDate(playedAt, 'yyyy/MM/dd hh:mm:ss');
 }
+
+export const dateToISOStringWithTZ = (date: Date): string => {
+  // assume that the given Date is in UTC.
+  const pad = function (str: string): string {
+    return ('0' + str).slice(-2);
+  };
+  const year = date.getFullYear().toString();
+  const month = pad((date.getMonth() + 1).toString());
+  const day = pad(date.getDate().toString());
+  const hour = pad(date.getHours().toString());
+  const min = pad(date.getMinutes().toString());
+  const sec = pad(date.getSeconds().toString());
+  const tz = -date.getTimezoneOffset();
+  const sign = tz >= 0 ? '+' : '-';
+  const tzHour = pad((tz / 60).toString());
+  const tzMin = pad((tz % 60).toString());
+  return `${year}-${month}-${day}T${hour}:${min}:${sec}${sign}${tzHour}:${tzMin}`;
+};
+
+export const gpNameToDate = (fileName: string): Date | null => {
+  // album_2023-10-08_00-35-34.gif
+  let work = '';
+  if (fileName.length !== 29) {
+    return null;
+  }
+  work = fileName.split('.')[0];
+  if (work.split('_').length !== 3) {
+    return null;
+  }
+  const date = work.split('_')[1];
+  const [yearS, monthS, dayS] = date.split('-');
+  const [year, month, day] = [Number(yearS), Number(monthS), Number(dayS)];
+  const time = work.split('_')[2];
+  const [hourS, minuteS, secondS] = time.split('-');
+  const [hour, minute, second] = [
+    Number(hourS),
+    Number(minuteS),
+    Number(secondS),
+  ];
+  if (
+    isNaN(year) ||
+    isNaN(month) ||
+    isNaN(day) ||
+    isNaN(hour) ||
+    isNaN(minute) ||
+    isNaN(second)
+  ) {
+    return null;
+  }
+  const localDate = new Date(year, month - 1, day, hour, minute, second);
+  return new Date(
+    localDate.getUTCFullYear(),
+    localDate.getUTCMonth(),
+    localDate.getUTCDate(),
+    localDate.getUTCHours(),
+    localDate.getUTCMinutes(),
+    localDate.getUTCSeconds()
+  );
+};
+
+export const blobToBase64 = (blob: Blob) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise<string>((resolve) => {
+    reader.onloadend = () => {
+      if (typeof reader.result !== 'string') {
+        resolve('');
+      } else {
+        resolve(reader.result.split(',')[1]);
+      }
+    };
+  });
+};
