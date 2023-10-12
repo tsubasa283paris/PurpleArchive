@@ -1,7 +1,12 @@
 import axios from 'axios';
 
-import { blobToBase64, getApiUrl } from '../functionalities/Utils';
+import {
+  blobToBase64,
+  dateToISOStringWithTZ,
+  getApiUrl,
+} from '../functionalities/Utils';
 import { authHeader } from '../functionalities/AuthContext';
+import { Tag } from './Tags';
 
 export interface AlbumOutlines {
   id: number;
@@ -91,7 +96,6 @@ export interface UploadTempAlbumResp {
 
 export const uploadTempAlbum = (tempAlbum: File) => {
   return blobToBase64(tempAlbum).then((b64) => {
-    console.log(b64);
     return axios.post<UploadTempAlbumResp>(
       getApiUrl('/albums/temp'),
       {
@@ -102,4 +106,44 @@ export const uploadTempAlbum = (tempAlbum: File) => {
       }
     );
   });
+};
+
+export interface GetAlbumResp {
+  id: number;
+  source: string;
+  thumbSource: string;
+  pvCount: number;
+  downloadCount: number;
+  bookmarkCount: number;
+  pageCount: number;
+  isBookmarked: boolean;
+  playedAt: string;
+  contributorUserId: string;
+  gamemodeId: number;
+  tags: Tag[];
+  pageMetaData: PageMetaData[];
+  created_at: string;
+  updated_at: string;
+}
+
+export const uploadAlbum = (
+  temporaryAlbumUuid: string,
+  gamemodeId: number,
+  tagIds: number[],
+  playedAt: Date,
+  pageMetaData: PageMetaData[]
+) => {
+  return axios.post<GetAlbumResp>(
+    getApiUrl('/albums'),
+    {
+      temporaryAlbumUuid: temporaryAlbumUuid,
+      gamemodeId: gamemodeId,
+      tagIds: tagIds,
+      playedAt: dateToISOStringWithTZ(playedAt),
+      pageMetaData: pageMetaData,
+    },
+    {
+      headers: authHeader(),
+    }
+  );
 };
