@@ -42,7 +42,6 @@ export interface GetAlbumsParams {
 }
 
 export const getAlbums = (params: GetAlbumsParams) => {
-  console.log(params);
   return axios.get<GetAlbumsResp>(getApiUrl('/albums'), {
     headers: authHeader(),
     params: params,
@@ -125,6 +124,13 @@ export interface GetAlbumResp {
   created_at: string;
   updated_at: string;
 }
+
+export const getAlbum = (albumId: number, incrementPv: boolean = false) => {
+  return axios.get<GetAlbumResp>(getApiUrl(`/albums/${albumId}`), {
+    headers: authHeader(),
+    params: { incrementPv: incrementPv },
+  });
+};
 
 export const uploadAlbum = (
   temporaryAlbumUuid: string,

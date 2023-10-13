@@ -58,7 +58,7 @@ export const AppBar = (props: AppBarProps) => {
           }}
         >
           <img
-            src='logofull_white.png'
+            src='/logofull_white.png'
             alt='service logo'
             style={{
               display: 'block',

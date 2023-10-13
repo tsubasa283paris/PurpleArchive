@@ -11,6 +11,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useNavigate } from 'react-router-dom';
 
 import { formatPlayedAt } from '../functionalities/Utils';
 import { BootstrapTooltip } from './Tooltip';
@@ -28,6 +29,12 @@ interface AlbumCardProps {
 }
 
 export const AlbumCard = (props: AlbumCardProps) => {
+  const navigate = useNavigate();
+
+  const navigateToAlbum = () => {
+    navigate(`/albums/${props.albumId}`, { replace: true });
+  };
+
   return (
     <Card
       sx={{
@@ -41,8 +48,10 @@ export const AlbumCard = (props: AlbumCardProps) => {
         sx={{
           // 770:525
           pt: '68.18%',
+          cursor: 'pointer',
         }}
         image={props.thumbSource}
+        onClick={navigateToAlbum}
       />
       <CardContent
         sx={{

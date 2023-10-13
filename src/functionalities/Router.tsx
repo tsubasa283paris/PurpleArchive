@@ -7,6 +7,7 @@ import NotFoundPage from '../pages/404';
 import LoginPage from '../pages/Login';
 import { useAuthInfo } from './AuthContext';
 import { Bars } from '../components/Bars';
+import AlbumPage from '../pages/Album';
 
 const Router: React.FC = () => {
   const authInfo = useAuthInfo();
@@ -24,6 +25,15 @@ const Router: React.FC = () => {
               <React.Fragment>
                 <Bars location='top' />
                 <TopPage />
+              </React.Fragment>
+            }
+          />
+          <Route
+            path='/albums/:id'
+            element={
+              <React.Fragment>
+                <Bars location='top' />
+                <AlbumPage />
               </React.Fragment>
             }
           />
