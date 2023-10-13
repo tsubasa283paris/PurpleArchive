@@ -13,6 +13,7 @@ import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import { formatPlayedAt } from '../functionalities/Utils';
+import { BootstrapTooltip } from './Tooltip';
 
 interface AlbumCardProps {
   albumId: number;
@@ -82,26 +83,34 @@ export const AlbumCard = (props: AlbumCardProps) => {
       <CardActions
         sx={{ display: 'flex', borderTop: 1, borderColor: 'grey.300' }}
       >
-        <Button
-          size='small'
-          aria-label='add to bookmark'
-          onClick={() => {
-            props.handlePressBookmark(props.albumId, props.isBookmarked);
-          }}
-          sx={{ flexGrow: 1 }}
+        <BootstrapTooltip
+          title={
+            props.isBookmarked ? 'ブックマークを解除' : 'ブックマークに追加'
+          }
         >
-          {props.isBookmarked ? <StarIcon /> : <StarBorderOutlinedIcon />}
-        </Button>
-        <Button
-          size='small'
-          aria-label='download'
-          onClick={() => {
-            props.handlePressDownload(props.albumId);
-          }}
-          sx={{ flexGrow: 1 }}
-        >
-          <DownloadIcon />
-        </Button>
+          <Button
+            size='small'
+            aria-label='add to bookmark'
+            onClick={() => {
+              props.handlePressBookmark(props.albumId, props.isBookmarked);
+            }}
+            sx={{ flexGrow: 1 }}
+          >
+            {props.isBookmarked ? <StarIcon /> : <StarBorderOutlinedIcon />}
+          </Button>
+        </BootstrapTooltip>
+        <BootstrapTooltip title='ダウンロード'>
+          <Button
+            size='small'
+            aria-label='download'
+            onClick={() => {
+              props.handlePressDownload(props.albumId);
+            }}
+            sx={{ flexGrow: 1 }}
+          >
+            <DownloadIcon />
+          </Button>
+        </BootstrapTooltip>
       </CardActions>
     </Card>
   );

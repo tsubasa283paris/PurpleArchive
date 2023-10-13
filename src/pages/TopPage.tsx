@@ -41,6 +41,7 @@ import AlbumFilterDialog, {
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
 import { formatDate } from '../functionalities/Utils';
 import AlbumUploadDialog from '../components/AlbumUploadDialog';
+import { version } from '../version';
 
 const albumsPerPage = 12;
 
@@ -490,7 +491,7 @@ const TopPage: React.FC = () => {
         </Container>
         <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
           <Typography variant='h6' align='center' gutterBottom>
-            Purple Archive
+            {'Purple Archive ' + version}
           </Typography>
           <Typography
             variant='subtitle1'
@@ -498,15 +499,7 @@ const TopPage: React.FC = () => {
             color='text.secondary'
             component='p'
           >
-            {'Hello, ' + authInfo?.userInfo.displayName + ' !'}
-          </Typography>
-          <Typography
-            variant='subtitle1'
-            align='center'
-            color='text.secondary'
-            component='p'
-          >
-            {'Fetched: ' + String(albumsTotalCount) + ' albums'}
+            {'Logged in as ' + authInfo?.userInfo.displayName}
           </Typography>
         </Box>
         <AlbumFilterDialog
