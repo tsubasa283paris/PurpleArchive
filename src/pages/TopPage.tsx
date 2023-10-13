@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
+import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
 
 import {
   LogoutExpired,
@@ -423,6 +424,30 @@ const TopPage: React.FC = () => {
           {isAlbumsLoading ? (
             <Box sx={{ display: 'grid', placeItems: 'center', height: '50vh' }}>
               <CircularProgress size={'4em'} />
+            </Box>
+          ) : albumsTotalCount === 0 ? (
+            <Box
+              sx={{
+                height: 320,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <SentimentDissatisfiedIcon
+                  sx={{ fontSize: 100, color: 'lightgrey' }}
+                />
+                <Typography variant='h5' sx={{ color: 'lightgrey' }}>
+                  アルバムがありません
+                </Typography>
+              </Box>
             </Box>
           ) : (
             <React.Fragment>
