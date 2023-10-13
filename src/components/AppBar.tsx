@@ -57,7 +57,8 @@ export const AppBar = (props: AppBarProps) => {
             maxHeight: 32,
           }}
         >
-          <img
+          <Box
+            component='img'
             src='/logofull_white.png'
             alt='service logo'
             style={{
@@ -65,6 +66,7 @@ export const AppBar = (props: AppBarProps) => {
               maxWidth: '100%',
               maxHeight: '100%',
               objectFit: 'scale-down',
+              pointerEvents: 'none',
             }}
           />
         </Box>
