@@ -1,5 +1,5 @@
 import MuiDrawer from '@mui/material/Drawer';
-import { Box, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -61,7 +61,7 @@ const DrawerProxy = styled(MuiDrawer, {
   }),
 }));
 
-export type LocationLiteral = 'top' | 'mypage';
+export type LocationLiteral = 'top' | 'mypage' | '404';
 
 interface DrawerProps {
   open: boolean;
@@ -77,9 +77,6 @@ export const Drawer = (props: DrawerProps) => {
   return (
     <DrawerProxy variant='permanent' open={props.open}>
       <DrawerHeader>
-        <Box sx={{ width: '100%', textAlign: 'center', paddingTop: '0.3em' }}>
-          <img src='logo192.png' alt='Purple Archive logo' height='40em' />
-        </Box>
         <IconButton onClick={props.onClickCloseDrawer}>
           {theme.direction === 'rtl' ? (
             <ChevronRightIcon />

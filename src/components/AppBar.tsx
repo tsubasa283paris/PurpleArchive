@@ -54,10 +54,19 @@ export const AppBar = (props: AppBarProps) => {
             my: '1em',
             display: 'flex',
             justifyContent: 'center',
-            maxHeight: '100%',
+            maxHeight: 32,
           }}
         >
-          <img src='logofull_white.png' alt='service logo' width='15%' />
+          <img
+            src='logofull_white.png'
+            alt='service logo'
+            style={{
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'scale-down',
+            }}
+          />
         </Box>
       </Toolbar>
     </AppBarProxy>
