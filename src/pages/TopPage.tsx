@@ -255,6 +255,7 @@ const TopPage: React.FC = () => {
     value: number
   ) => {
     setPage(value - 1);
+    localStorage.setItem('albumsPage', String(value - 1));
   };
 
   const loadAlbums = () => {
@@ -279,6 +280,12 @@ const TopPage: React.FC = () => {
         }
         setAlbums(response.data.albums);
         setAlbumsTotalCount(response.data.albumsCountAll);
+        const numPages = Math.ceil(
+          response.data.albumsCountAll / albumsPerPage
+        );
+        if (page >= numPages) {
+          setPage(numPages - 1);
+        }
         console.log('successfully fetched and updated albums');
         setIsAlbumLoading(false);
         return ARS.Ok;
@@ -342,6 +349,7 @@ const TopPage: React.FC = () => {
       const gi = localStorage.getItem('albumsFilterGI');
       const pt = localStorage.getItem('albumsFilterPT');
       const so = localStorage.getItem('albumsSortOrder');
+      const page_ = localStorage.getItem('albumsPage');
       if (pd !== null && pd.length > 0) {
         setPartialDescription(pd);
       }
@@ -362,6 +370,9 @@ const TopPage: React.FC = () => {
       }
       if (so !== null) {
         setSortModeIndex(Number(so));
+      }
+      if (page_ !== null) {
+        setPage(Number(page_));
       }
       console.log(
         'successfully loaded filters and sort order from localStorage'
