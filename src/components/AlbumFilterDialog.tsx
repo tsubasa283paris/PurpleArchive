@@ -385,6 +385,7 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
                     <Button
                       variant='contained'
                       size='small'
+                      key={tag.name}
                       onClick={() => {
                         setPartialTag(tag.name);
                         setSuggestTags([]);

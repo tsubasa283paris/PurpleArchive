@@ -132,6 +132,25 @@ export const getAlbum = (albumId: number, incrementPv: boolean = false) => {
   });
 };
 
+export const updateAlbum = (
+  albumId: number,
+  gamemodeId: number,
+  tagIds: number[],
+  pageMetaData: PageMetaData[]
+) => {
+  return axios.put<GetAlbumResp>(
+    getApiUrl(`/albums/${albumId}`),
+    {
+      gamemodeId: gamemodeId,
+      tagIds: tagIds,
+      pageMetaData: pageMetaData,
+    },
+    {
+      headers: authHeader(),
+    }
+  );
+};
+
 export const uploadAlbum = (
   temporaryAlbumUuid: string,
   gamemodeId: number,
@@ -152,4 +171,11 @@ export const uploadAlbum = (
       headers: authHeader(),
     }
   );
+};
+
+export const getAlbumRaw = (albumId: number) => {
+  return axios.get<Blob>(getApiUrl(`/albums/${albumId}/raw`), {
+    headers: authHeader(),
+    responseType: 'blob',
+  });
 };

@@ -28,6 +28,7 @@ import {
 import {
   AlbumOutlines,
   bookmarkOne,
+  getAlbumRaw,
   getAlbums,
   incrementDlCount,
   unBookmarkOne,
@@ -39,7 +40,7 @@ import AlbumFilterDialog, {
   AlbumFilter,
 } from '../components/AlbumFilterDialog';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
-import { formatDate } from '../functionalities/Utils';
+import { dateToGpName } from '../functionalities/Utils';
 import AlbumUploadDialog from '../components/AlbumUploadDialog';
 import { version } from '../version';
 
@@ -209,31 +210,37 @@ const TopPage: React.FC = () => {
       .then(() => {
         // find target album
         let fileName: string = '';
-        let fileHref: string = '';
         let tempAlbums: AlbumOutlines[] = [];
         albums.forEach((album) => {
           if (album.id === albumId) {
-            // store file name and href
-            fileName =
-              'album_' +
-              formatDate(new Date(album.playedAt), 'yyyy-MM-dd_hh-mm-ss') +
-              '.gif';
-            fileHref = album.source;
+            // give album file redirect API
+            fileName = dateToGpName(new Date(album.playedAt));
             // update download count
             album.downloadCount += 1;
           }
           tempAlbums.push(album);
         });
         setAlbums(tempAlbums);
-        // make album downloaded
-        const link = document.createElement('a');
-        link.setAttribute('href', fileHref);
-        link.setAttribute('download', fileName);
-        /**
-         * @todo this 'download' update does not work. give users
-         *       GIF files with datetime in their name!
-         */
-        link.click();
+        getAlbumRaw(albumId)
+          .then((response) => {
+            // make album downloaded
+            const href = URL.createObjectURL(response.data);
+            const link = document.createElement('a');
+            link.setAttribute('href', href);
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+
+            // cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response && error.response.status === 401) {
+              LogoutExpired(setAuthInfo);
+            }
+          });
       })
       .catch((error) => {
         console.log(error);
