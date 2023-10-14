@@ -1,6 +1,6 @@
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { IconButton } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -49,6 +49,27 @@ export const AppBar = (props: AppBarProps) => {
         >
           <MenuIcon />
         </IconButton>
+        <Box
+          sx={{
+            my: '1em',
+            display: 'flex',
+            justifyContent: 'center',
+            maxHeight: 32,
+          }}
+        >
+          <Box
+            component='img'
+            src='/logofull_white.png'
+            alt='service logo'
+            style={{
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'scale-down',
+              pointerEvents: 'none',
+            }}
+          />
+        </Box>
       </Toolbar>
     </AppBarProxy>
   );

@@ -14,13 +14,11 @@ export const Bars = (props: BarsProps) => {
   const navigate = useNavigate();
 
   const handleJumpBrowse = () => {
-    navigate('/', { replace: true });
-    console.log('jump to browse');
+    navigate('/albums', { replace: true });
   };
 
   const handleJumpMyPage = () => {
     navigate('/mypage', { replace: true });
-    console.log('jump to my page');
   };
 
   return (

@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
+import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
 
 import {
   LogoutExpired,
@@ -27,6 +28,7 @@ import {
 import {
   AlbumOutlines,
   bookmarkOne,
+  getAlbumRaw,
   getAlbums,
   incrementDlCount,
   unBookmarkOne,
@@ -38,8 +40,9 @@ import AlbumFilterDialog, {
   AlbumFilter,
 } from '../components/AlbumFilterDialog';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
-import { formatDate } from '../functionalities/Utils';
+import { dateToGpName } from '../functionalities/Utils';
 import AlbumUploadDialog from '../components/AlbumUploadDialog';
+import { version } from '../version';
 
 const albumsPerPage = 12;
 
@@ -207,31 +210,37 @@ const TopPage: React.FC = () => {
       .then(() => {
         // find target album
         let fileName: string = '';
-        let fileHref: string = '';
         let tempAlbums: AlbumOutlines[] = [];
         albums.forEach((album) => {
           if (album.id === albumId) {
-            // store file name and href
-            fileName =
-              'album_' +
-              formatDate(new Date(album.playedAt), 'yyyy-MM-dd_hh-mm-ss') +
-              '.gif';
-            fileHref = album.source;
+            // give album file redirect API
+            fileName = dateToGpName(new Date(album.playedAt));
             // update download count
             album.downloadCount += 1;
           }
           tempAlbums.push(album);
         });
         setAlbums(tempAlbums);
-        // make album downloaded
-        const link = document.createElement('a');
-        link.setAttribute('href', fileHref);
-        link.setAttribute('download', fileName);
-        /**
-         * @todo this 'download' update does not work. give users
-         *       GIF files with datetime in their name!
-         */
-        link.click();
+        getAlbumRaw(albumId)
+          .then((response) => {
+            // make album downloaded
+            const href = URL.createObjectURL(response.data);
+            const link = document.createElement('a');
+            link.setAttribute('href', href);
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+
+            // cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response && error.response.status === 401) {
+              LogoutExpired(setAuthInfo);
+            }
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -424,6 +433,30 @@ const TopPage: React.FC = () => {
             <Box sx={{ display: 'grid', placeItems: 'center', height: '50vh' }}>
               <CircularProgress size={'4em'} />
             </Box>
+          ) : albumsTotalCount === 0 ? (
+            <Box
+              sx={{
+                height: 320,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <SentimentDissatisfiedIcon
+                  sx={{ fontSize: 100, color: 'lightgrey' }}
+                />
+                <Typography variant='h5' sx={{ color: 'lightgrey' }}>
+                  アルバムがありません
+                </Typography>
+              </Box>
+            </Box>
           ) : (
             <React.Fragment>
               <Box sx={{ height: '0.5em' }} />
@@ -465,7 +498,7 @@ const TopPage: React.FC = () => {
         </Container>
         <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
           <Typography variant='h6' align='center' gutterBottom>
-            Purple Archive
+            {'Purple Archive ' + version}
           </Typography>
           <Typography
             variant='subtitle1'
@@ -473,15 +506,7 @@ const TopPage: React.FC = () => {
             color='text.secondary'
             component='p'
           >
-            {'Hello, ' + authInfo?.userInfo.displayName + ' !'}
-          </Typography>
-          <Typography
-            variant='subtitle1'
-            align='center'
-            color='text.secondary'
-            component='p'
-          >
-            {'Fetched: ' + String(albumsTotalCount) + ' albums'}
+            {'Logged in as ' + authInfo?.userInfo.displayName}
           </Typography>
         </Box>
         <AlbumFilterDialog

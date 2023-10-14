@@ -290,10 +290,15 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
               <Box sx={{ display: 'flex', height: 360 }}>
                 <Box sx={{ my: 'auto', p: '3em', width: '40%', flexGrow: 1 }}>
                   {tempAlbumPath && (
-                    <img
+                    <Box
+                      component='img'
                       src={tempAlbumPath}
                       alt='uploaded album'
-                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        pointerEvents: 'none',
+                      }}
                     />
                   )}
                 </Box>
@@ -364,10 +369,15 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
                     sx={{ my: 'auto', px: '3em', width: '40%', flexGrow: 1 }}
                   >
                     {tempAlbumPath && (
-                      <img
+                      <Box
+                        component='img'
                         src={tempAlbumPath}
                         alt='uploaded album'
-                        style={{ maxWidth: '100%', maxHeight: '100%' }}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          pointerEvents: 'none',
+                        }}
                       />
                     )}
                   </Box>

@@ -102,6 +102,7 @@ const LoginPage: React.FC<{}> = () => {
             marginLeft: 'auto',
             marginRight: 'auto',
             maxHeight: '7em',
+            pointerEvents: 'none',
           }}
           alt='Purple Archive icon'
           src='/logo192.png'

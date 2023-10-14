@@ -56,6 +56,11 @@ export const dateToISOStringWithTZ = (date: Date): string => {
   return `${year}-${month}-${day}T${hour}:${min}:${sec}${sign}${tzHour}:${tzMin}`;
 };
 
+export const dateToGpName = (date: Date): string => {
+  // album_2023-10-08_00-35-34.gif
+  return 'album_' + formatDate(date, 'yyyy-MM-dd_hh-mm-ss') + '.gif';
+};
+
 export const gpNameToDate = (fileName: string): Date | null => {
   // album_2023-10-08_00-35-34.gif
   let work = '';

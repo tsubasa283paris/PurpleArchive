@@ -25,3 +25,15 @@ export const getTags = (params: GetTagsParams) => {
     params: params,
   });
 };
+
+export const uploadTag = (name: string) => {
+  return axios.post<Tag>(
+    getApiUrl('/tags'),
+    {
+      name: name,
+    },
+    {
+      headers: authHeader(),
+    }
+  );
+};
