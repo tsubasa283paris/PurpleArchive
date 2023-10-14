@@ -91,15 +91,7 @@ export const gpNameToDate = (fileName: string): Date | null => {
   ) {
     return null;
   }
-  const localDate = new Date(year, month - 1, day, hour, minute, second);
-  return new Date(
-    localDate.getUTCFullYear(),
-    localDate.getUTCMonth(),
-    localDate.getUTCDate(),
-    localDate.getUTCHours(),
-    localDate.getUTCMinutes(),
-    localDate.getUTCSeconds()
-  );
+  return new Date(year, month - 1, day, hour, minute, second);
 };
 
 export const blobToBase64 = (blob: Blob) => {
