@@ -284,7 +284,7 @@ const TopPage: React.FC = () => {
           response.data.albumsCountAll / albumsPerPage
         );
         if (page >= numPages) {
-          setPage(numPages - 1);
+          setPage(Math.max(numPages - 1, 0));
         }
         console.log('successfully fetched and updated albums');
         setIsAlbumLoading(false);
