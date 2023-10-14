@@ -144,6 +144,7 @@ const TopPage: React.FC = () => {
     setPlayedUntil(albumFilter.playedUntil);
     setGamemodeId(albumFilter.gamemodeId);
     setPartialTag(albumFilter.partialTag);
+    setPage(0);
 
     // also save them to localStorage
     localStorage.setItem(
@@ -164,6 +165,7 @@ const TopPage: React.FC = () => {
       albumFilter.gamemodeId ? String(albumFilter.gamemodeId) : ''
     );
     localStorage.setItem('albumsFilterPT', albumFilter.partialTag ?? '');
+    localStorage.setItem('albumsPage', '0');
   };
 
   const handleCloseUploadDialog = () => {
@@ -284,7 +286,9 @@ const TopPage: React.FC = () => {
           response.data.albumsCountAll / albumsPerPage
         );
         if (page >= numPages) {
-          setPage(Math.max(numPages - 1, 0));
+          const page_ = Math.max(numPages - 1, 0);
+          setPage(page_);
+          localStorage.setItem('albumsPage', String(page_));
         }
         console.log('successfully fetched and updated albums');
         setIsAlbumLoading(false);
