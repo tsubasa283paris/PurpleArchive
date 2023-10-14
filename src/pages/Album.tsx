@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -12,9 +13,9 @@ import {
   IconButton,
   MenuItem,
   Select,
+  Snackbar,
   TextField,
   Toolbar,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -54,6 +55,8 @@ const AlbumPage: React.FC = () => {
   const [gamemodeList, setGamemodeList] = React.useState<Gamemode[]>([]);
   const [isAlbumUpdateLoading, setIsAlbumUpdateLoading] =
     React.useState<boolean>(false);
+  const [openAlbumSaveSnackbar, setOpenAlbumSaveSnackbar] =
+    React.useState<boolean>(false);
   const [openAddTagDialog, setOpenAddTagDialog] =
     React.useState<boolean>(false);
   const [addTag, setAddTag] = React.useState<string>('');
@@ -68,6 +71,17 @@ const AlbumPage: React.FC = () => {
   const setAuthInfo = useSetAuthInfo();
 
   const navigate = useNavigate();
+
+  const handleCloseAlbumSaveSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenAlbumSaveSnackbar(false);
+  };
 
   const handlePressBookmark = () => {
     const p = album!.isBookmarked
@@ -293,6 +307,7 @@ const AlbumPage: React.FC = () => {
     updateAlbum(album_.id, album_.gamemodeId, tagIds, album_.pageMetaData)
       .then((response) => {
         setIsAlbumUpdateLoading(false);
+        setOpenAlbumSaveSnackbar(true);
       })
       .catch((error) => {
         console.log(error);
@@ -387,7 +402,15 @@ const AlbumPage: React.FC = () => {
                   height: 'calc(100vh - 200px)',
                 }}
               >
-                <Box sx={{ flexGrow: 1, width: '50%', pr: '0.3em' }}>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    width: '50%',
+                    height: '100%',
+                    pr: '0.3em',
+                    overflowY: 'auto',
+                  }}
+                >
                   <Box
                     component='img'
                     src={album.source}
@@ -497,7 +520,11 @@ const AlbumPage: React.FC = () => {
                         {album.tags.map((tag) => (
                           <Box
                             key={tag.name}
-                            sx={{ display: 'flex', alignItems: 'center' }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              mr: '0.4em',
+                            }}
                           >
                             <Button
                               variant='contained'
@@ -636,6 +663,19 @@ const AlbumPage: React.FC = () => {
           )}
         </Container>
       </main>
+      <Snackbar
+        open={openAlbumSaveSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseAlbumSaveSnackbar}
+      >
+        <Alert
+          onClose={handleCloseAlbumSaveSnackbar}
+          severity='success'
+          sx={{ width: '100%' }}
+        >
+          アルバム情報を保存しました。
+        </Alert>
+      </Snackbar>
       <Dialog onClose={() => {}} open={openAddTagDialog}>
         <DialogTitle>タグ追加</DialogTitle>
         <Divider />
