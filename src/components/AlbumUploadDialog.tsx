@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Divider,
   FormControl,
+  Link,
   MenuItem,
   Select,
   Slide,
@@ -21,6 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import { PageMetaData, uploadAlbum, uploadTempAlbum } from '../services/Albums';
 import { LogoutExpired, useSetAuthInfo } from '../functionalities/AuthContext';
@@ -29,14 +31,13 @@ import { gpNameToDate } from '../functionalities/Utils';
 
 const transitionLength = 800;
 
-interface ConfirmTempAlbumProceedDialogProps {
+interface AlbumAlreadyExistsDialogProps {
   open: boolean;
   onClose: (confirm: boolean) => void;
+  existingAlbumId: number | null;
 }
 
-const ConfirmTempAlbumProceedDialog = (
-  props: ConfirmTempAlbumProceedDialogProps
-) => {
+const AlbumAlreadyExistsDialog = (props: AlbumAlreadyExistsDialogProps) => {
   const { open, onClose } = props;
   return (
     <Dialog
@@ -47,7 +48,11 @@ const ConfirmTempAlbumProceedDialog = (
     >
       <Box sx={{ width: 360 }}>
         <Typography sx={{ m: '1em' }}>
-          同じデータのアルバムがすでに存在します。
+          <Link href={`/albums/${props.existingAlbumId!}`} target='_blank'>
+            同じデータのアルバム
+            <OpenInNewIcon fontSize='small' />
+          </Link>
+          がすでに存在します。
         </Typography>
         <Box sx={{ display: 'flex', m: '1em', justifyContent: 'center' }}>
           <Button
@@ -82,8 +87,11 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
   const [isAlbumUploading, setIsAlbumUploading] =
     React.useState<boolean>(false);
   const [gamemodeList, setGamemodeList] = React.useState<Gamemode[]>([]);
-  const [openConfirmDialog, setOpenConfirmDialog] =
+  const [openAlbumAlreadyExistsDialog, setOpenAlbumAlreadyExistsDialog] =
     React.useState<boolean>(false);
+  const [alreadyExistsAlbumId, setAlreadyExistsAlbumId] = React.useState<
+    number | null
+  >(null);
   const [upAlbumUuid, setUpAlbumUuid] = React.useState<string>('');
   const [upAlbumPages, setUpAlbumPages] = React.useState<PageMetaData[]>([]);
   const [upAlbumGamemodeId, setUpAlbumGameId] = React.useState<number>(0);
@@ -137,8 +145,9 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
           setUpAlbumGameId(respGamemodes.data.gamemodes[0].id);
           setUpAlbumUuid(tempAlbumResult.temporaryAlbumUuid);
           setUpAlbumPages(tempAlbumResult.pageMetaData);
+          setAlreadyExistsAlbumId(tempAlbumResult.hashMatchResult);
           if (tempAlbumResult.hashMatchResult) {
-            setOpenConfirmDialog(true);
+            setOpenAlbumAlreadyExistsDialog(true);
             return;
           }
           proceedUploadTempAlbum();
@@ -212,13 +221,13 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
       });
   };
 
-  const handleCloseConfirmDialog = (confirm: boolean) => {
+  const handleCloseAlbumAlreadyExistsDialog = (confirm: boolean) => {
     if (confirm) {
       proceedUploadTempAlbum();
     } else {
       setIsTempAlbumUploading(false);
     }
-    setOpenConfirmDialog(false);
+    setOpenAlbumAlreadyExistsDialog(false);
   };
 
   const handleCloseErrorSnackbar = (
@@ -506,9 +515,10 @@ const AlbumUploadDialog = (props: AlbumUploadDialogProps) => {
             </Slide>
           )}
         </Box>
-        <ConfirmTempAlbumProceedDialog
-          open={openConfirmDialog}
-          onClose={handleCloseConfirmDialog}
+        <AlbumAlreadyExistsDialog
+          open={openAlbumAlreadyExistsDialog}
+          onClose={handleCloseAlbumAlreadyExistsDialog}
+          existingAlbumId={alreadyExistsAlbumId}
         />
       </Dialog>
       <Snackbar
