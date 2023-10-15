@@ -6,6 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import {
   Badge,
   Box,
+  Checkbox,
   CircularProgress,
   Divider,
   FormControl,
@@ -32,6 +33,7 @@ export interface AlbumFilter {
   playedUntil: Date | null;
   gamemodeId: number | null;
   partialTag: string | null;
+  myBookmark: boolean;
 }
 
 export interface AlbumFilterDialogProps {
@@ -62,6 +64,9 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
   const [partialTag, setPartialTag] = React.useState<string>(
     albumFilter.partialTag ?? ''
   );
+  const [myBookmark, setMyBookmark] = React.useState<boolean>(
+    albumFilter.myBookmark
+  );
   const [isSuggestTagsLoading, setIsSuggestTagsLoading] =
     React.useState<boolean>(false);
   const [suggestTags, setSuggestTags] = React.useState<Tag[]>([]);
@@ -82,6 +87,7 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
       playedUntil: playedUntil,
       gamemodeId: gamemodeId,
       partialTag: partialTag.length ? partialTag : null,
+      myBookmark: myBookmark,
     });
   };
 
@@ -125,6 +131,7 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
     setPlayedUntil(albumFilter.playedUntil);
     setGamemodeId(albumFilter.gamemodeId);
     setPartialTag(albumFilter.partialTag ?? '');
+    setMyBookmark(albumFilter.myBookmark);
   }, [albumFilter]);
 
   return (
@@ -136,7 +143,8 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
             Number(partialPlayerName.length > 0) +
             Number(playedFrom !== null || playedUntil !== null) +
             Number(gamemodeId !== null) +
-            Number(partialTag.length > 0)
+            Number(partialTag.length > 0) +
+            Number(myBookmark)
           }
           color='primary'
         >
@@ -147,6 +155,40 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
       </DialogTitle>
       <Divider />
       <Box sx={{ m: '1em', width: 450 }}>
+        <Box sx={{ display: 'flex', my: '0.5em' }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              width: '8%',
+              mx: '0.3em',
+              my: 'auto',
+              textAlign: 'center',
+            }}
+          >
+            {myBookmark && (
+              <CheckCircleIcon color='primary' sx={{ marginTop: '0.2em' }} />
+            )}
+          </Box>
+          <Box sx={{ flexGrow: 1, width: '37%', mx: '0.3em', my: 'auto' }}>
+            <Typography sx={{}}>マイブックマーク</Typography>
+          </Box>
+          <Box
+            sx={{
+              flexGrow: 1,
+              width: '55%',
+              mx: '0.3em',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Checkbox
+              checked={myBookmark}
+              onChange={(event) => {
+                setMyBookmark(event.target.checked);
+              }}
+            />
+          </Box>
+        </Box>
         <Box sx={{ display: 'flex', my: '0.5em' }}>
           <Box
             sx={{

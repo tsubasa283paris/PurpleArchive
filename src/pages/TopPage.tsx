@@ -128,6 +128,7 @@ const TopPage: React.FC = () => {
   const [playedUntil, setPlayedUntil] = React.useState<Date | null>(null);
   const [gamemodeId, setGamemodeId] = React.useState<number | null>(null);
   const [partialTag, setPartialTag] = React.useState<string | null>(null);
+  const [myBookmark, setMyBookmark] = React.useState<boolean>(false);
 
   const authInfo = useAuthInfo();
   const setAuthInfo = useSetAuthInfo();
@@ -144,6 +145,7 @@ const TopPage: React.FC = () => {
     setPlayedUntil(albumFilter.playedUntil);
     setGamemodeId(albumFilter.gamemodeId);
     setPartialTag(albumFilter.partialTag);
+    setMyBookmark(albumFilter.myBookmark);
     setPage(0);
 
     // also save them to localStorage
@@ -165,6 +167,10 @@ const TopPage: React.FC = () => {
       albumFilter.gamemodeId ? String(albumFilter.gamemodeId) : ''
     );
     localStorage.setItem('albumsFilterPT', albumFilter.partialTag ?? '');
+    localStorage.setItem(
+      'albumsFilterMB',
+      String(Number(albumFilter.myBookmark))
+    );
     localStorage.setItem('albumsPage', '0');
   };
 
@@ -274,6 +280,7 @@ const TopPage: React.FC = () => {
       ...(playedUntil && { playedUntil: playedUntil.getTime() / 1000 }),
       ...(gamemodeId && { gamemodeId: gamemodeId }),
       ...(partialTag && { partialTag: partialTag }),
+      ...(myBookmark && { myBookmark: true }),
     })
       .then((response) => {
         // update albums
@@ -337,6 +344,7 @@ const TopPage: React.FC = () => {
     playedUntil,
     gamemodeId,
     partialTag,
+    myBookmark,
     sortModeIndex,
     page,
     mounted,
@@ -352,6 +360,7 @@ const TopPage: React.FC = () => {
       const pu = localStorage.getItem('albumsFilterPU');
       const gi = localStorage.getItem('albumsFilterGI');
       const pt = localStorage.getItem('albumsFilterPT');
+      const mb = localStorage.getItem('albumsFilterMB');
       const so = localStorage.getItem('albumsSortOrder');
       const page_ = localStorage.getItem('albumsPage');
       if (pd !== null && pd.length > 0) {
@@ -371,6 +380,9 @@ const TopPage: React.FC = () => {
       }
       if (pt !== null && pt.length > 0) {
         setPartialTag(pt);
+      }
+      if (mb !== null && mb.length > 0) {
+        setMyBookmark(Number(mb) === 1);
       }
       if (so !== null) {
         setSortModeIndex(Number(so));
@@ -407,7 +419,8 @@ const TopPage: React.FC = () => {
                     Number(partialPlayerName !== null) +
                     Number(playedFrom !== null || playedUntil !== null) +
                     Number(gamemodeId !== null) +
-                    Number(partialTag !== null)
+                    Number(partialTag !== null) +
+                    Number(myBookmark)
                   }
                   color='primary'
                 >
@@ -534,6 +547,7 @@ const TopPage: React.FC = () => {
             playedUntil: playedUntil,
             gamemodeId: gamemodeId,
             partialTag: partialTag,
+            myBookmark: myBookmark,
           }}
           onClose={handleCloseFilterDialog}
           onSaveClose={handleSaveCloseFilterDialog}
