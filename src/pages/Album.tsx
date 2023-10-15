@@ -532,7 +532,11 @@ const AlbumPage: React.FC = () => {
                               onClick={() => {
                                 handleClickExistingTag(tag.name);
                               }}
-                              sx={{ borderRadius: 100, m: '0.1em' }}
+                              sx={{
+                                borderRadius: 100,
+                                m: '0.1em',
+                                textTransform: 'none',
+                              }}
                             >
                               {tag.name}
                             </Button>
@@ -708,7 +712,11 @@ const AlbumPage: React.FC = () => {
                         setPreventSuggestTags(true);
                       }}
                       key={tag.name}
-                      sx={{ borderRadius: 100, m: '0.1em' }}
+                      sx={{
+                        borderRadius: 100,
+                        m: '0.1em',
+                        textTransform: 'none',
+                      }}
                     >
                       {tag.name}
                     </Button>
