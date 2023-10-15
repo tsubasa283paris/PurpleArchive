@@ -219,6 +219,7 @@ const AlbumPage: React.FC = () => {
       })
       .then(() => {
         setIsTagSaveLoading(false);
+        setAddTag('');
         if (pushTag) {
           setOpenAddTagDialog(false);
           tempTags.push(pushTag);
@@ -532,7 +533,11 @@ const AlbumPage: React.FC = () => {
                               onClick={() => {
                                 handleClickExistingTag(tag.name);
                               }}
-                              sx={{ borderRadius: 100, m: '0.1em' }}
+                              sx={{
+                                borderRadius: 100,
+                                m: '0.1em',
+                                textTransform: 'none',
+                              }}
                             >
                               {tag.name}
                             </Button>
@@ -676,7 +681,12 @@ const AlbumPage: React.FC = () => {
           アルバム情報を保存しました。
         </Alert>
       </Snackbar>
-      <Dialog onClose={() => {}} open={openAddTagDialog}>
+      <Dialog
+        onClose={() => {
+          setOpenAddTagDialog(false);
+        }}
+        open={openAddTagDialog}
+      >
         <DialogTitle>タグ追加</DialogTitle>
         <Divider />
         <Box sx={{ m: '1em', px: '2em', width: 320 }}>
@@ -708,7 +718,11 @@ const AlbumPage: React.FC = () => {
                         setPreventSuggestTags(true);
                       }}
                       key={tag.name}
-                      sx={{ borderRadius: 100, m: '0.1em' }}
+                      sx={{
+                        borderRadius: 100,
+                        m: '0.1em',
+                        textTransform: 'none',
+                      }}
                     >
                       {tag.name}
                     </Button>

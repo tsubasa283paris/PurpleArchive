@@ -391,7 +391,11 @@ const AlbumFilterDialog = (props: AlbumFilterDialogProps) => {
                         setSuggestTags([]);
                         setPreventSuggestTags(true);
                       }}
-                      sx={{ borderRadius: 100, m: '0.1em' }}
+                      sx={{
+                        borderRadius: 100,
+                        m: '0.1em',
+                        textTransform: 'none',
+                      }}
                     >
                       {tag.name}
                     </Button>
