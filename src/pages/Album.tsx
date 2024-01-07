@@ -17,6 +17,7 @@ import {
   TextField,
   Toolbar,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -39,13 +40,13 @@ import {
   unBookmarkOne,
   updateAlbum,
 } from '../services/Albums';
-import { drawerWidth } from '../components/Drawer';
 import { dateToGpName, formatPlayedAt } from '../functionalities/Utils';
 import { BootstrapTooltip } from '../components/Tooltip';
 import { Gamemode, getGamemodes } from '../services/Gamemodes';
 import { ARS } from '../functionalities/ApiResponseStatus';
 import { Tag, getTags, uploadTag } from '../services/Tags';
 import { useDebounce } from 'react-use';
+import { mediaQuery, useMediaQuery } from '../functionalities/MediaQuery';
 
 const AlbumPage: React.FC = () => {
   const { id } = useParams<string>();
@@ -71,6 +72,16 @@ const AlbumPage: React.FC = () => {
   const setAuthInfo = useSetAuthInfo();
 
   const navigate = useNavigate();
+
+  const theme = useTheme();
+
+  // responsive
+  const isSp = useMediaQuery(mediaQuery.sp);
+  const fontSizeTitle = isSp ? 16 : 24;
+  const fontSizeTitleIcon = fontSizeTitle;
+  const fontSizeMain = isSp ? 14 : 17;
+  const fontSizeSub = isSp ? 12 : 14;
+  const fontSizeInput = fontSizeSub;
 
   const handleCloseAlbumSaveSnackbar = (
     event?: React.SyntheticEvent | Event,
@@ -335,13 +346,297 @@ const AlbumPage: React.FC = () => {
     }
   }, []);
 
+  const imageBox = (album: GetAlbumResp) => {
+    return (
+      <Box
+        component='img'
+        src={album.source}
+        alt='album animation'
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          objectFit: 'scale-down',
+          pointerEvents: 'none',
+          marginTop: theme.spacing(1),
+          marginBottom: theme.spacing(1),
+        }}
+      />
+    );
+  };
+
+  const albumInfoLeft = (album: GetAlbumResp) => {
+    return (
+      <Box
+        sx={{
+          flexGrow: 1,
+          width: isSp ? '100%' : '50%',
+          height: '100%',
+          pr: isSp ? '0' : theme.spacing(2),
+          overflowY: 'auto',
+        }}
+      >
+        {!isSp && imageBox(album)}
+        <Box
+          sx={{
+            mx: isSp ? theme.spacing(1) : theme.spacing(8),
+            my: theme.spacing(1),
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <BootstrapTooltip title='表示回数'>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <VisibilityIcon
+                sx={{
+                  mr: theme.spacing(1),
+                  flexGrow: 1,
+                  fontSize: fontSizeMain,
+                }}
+              />
+              <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
+                {String(album.pvCount)}
+              </Typography>
+            </Box>
+          </BootstrapTooltip>
+          <BootstrapTooltip title='ブックマーク数'>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <StarIcon
+                sx={{
+                  mr: theme.spacing(1),
+                  flexGrow: 1,
+                  fontSize: fontSizeMain,
+                }}
+              />
+              <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
+                {String(album.bookmarkCount)}
+              </Typography>
+            </Box>
+          </BootstrapTooltip>
+          <BootstrapTooltip title='ダウンロード回数'>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <DownloadIcon
+                sx={{
+                  mr: theme.spacing(1),
+                  flexGrow: 1,
+                  fontSize: fontSizeMain,
+                }}
+              />
+              <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
+                {String(album.downloadCount)}
+              </Typography>
+            </Box>
+          </BootstrapTooltip>
+        </Box>
+        <Box
+          sx={{
+            my: theme.spacing(2),
+          }}
+        >
+          <Typography fontSize={fontSizeMain}>ゲームモード</Typography>
+          <Box
+            sx={{
+              mx: theme.spacing(5),
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <FormControl size='small' sx={{ width: '100%', maxWidth: 320 }}>
+              <Select
+                value={album.gamemodeId}
+                fullWidth
+                onChange={(event) => {
+                  handleUpdateAlbumGamemodeId(Number(event.target.value));
+                }}
+                sx={{ fontSize: fontSizeSub }}
+              >
+                {gamemodeList.map((gamemode, i) => (
+                  <MenuItem value={gamemode.id} key={String(gamemode.id)}>
+                    {gamemode.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box
+            sx={{
+              my: theme.spacing(2),
+              width: '100%',
+            }}
+          >
+            <Typography fontSize={fontSizeMain}>タグ</Typography>
+            <Box
+              sx={{
+                mx: theme.spacing(2),
+                display: 'flex',
+                flexWrap: 'wrap',
+              }}
+            >
+              {album.tags.map((tag) => (
+                <Box
+                  key={tag.name}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mr: theme.spacing(1),
+                  }}
+                >
+                  <Button
+                    variant='contained'
+                    size='small'
+                    onClick={() => {
+                      handleClickExistingTag(tag.name);
+                    }}
+                    sx={{
+                      borderRadius: 100,
+                      m: theme.spacing(0.5),
+                      textTransform: 'none',
+                      fontSize: fontSizeSub,
+                    }}
+                  >
+                    {tag.name}
+                  </Button>
+                  <IconButton
+                    size='small'
+                    onClick={() => {
+                      handleDeleteExistingTag(tag.id);
+                    }}
+                  >
+                    <CloseIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
+            <Box sx={{ my: '0.3em', float: 'right' }}>
+              {album.tags.length < 10 && (
+                <Button
+                  variant='contained'
+                  size='small'
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: fontSizeSub,
+                  }}
+                  onClick={() => {
+                    setOpenAddTagDialog(true);
+                  }}
+                >
+                  <AddIcon sx={{ fontSize: 16 }} />
+                  タグを追加…
+                </Button>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
+
+  const albumInfoRight = (album: GetAlbumResp) => {
+    return (
+      <Box
+        sx={{
+          flexGrow: 1,
+          width: isSp ? '100%' : '50%',
+          height: '100%',
+          pl: isSp ? '0' : theme.spacing(2),
+          my: theme.spacing(2),
+        }}
+      >
+        <Box
+          sx={{
+            height: 40,
+            display: 'flex',
+            justifyContent: 'space-between',
+            pb: theme.spacing(2),
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography fontSize={fontSizeMain}>ページ情報</Typography>
+          </Box>
+          <Button
+            size='small'
+            variant='contained'
+            onClick={handleSaveAlbumPageMetaData}
+            sx={{ fontSize: fontSizeSub }}
+          >
+            {isAlbumUpdateLoading ? (
+              <CircularProgress size='1.5em' sx={{ color: 'white' }} />
+            ) : (
+              '保存'
+            )}
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            height: 'calc(100% - 40px)',
+            overflowY: 'scroll',
+          }}
+        >
+          {album.pageMetaData.map((page, i) => (
+            <Card
+              variant='outlined'
+              key={i}
+              sx={{
+                m: '1em',
+                mt: i === 0 ? 0 : '1em',
+                mb: i === album.pageMetaData.length - 1 ? 0 : '1em',
+                p: '0.5em',
+              }}
+            >
+              <Typography fontSize={fontSizeSub}>
+                {'Page ' + String(i + 1)}
+              </Typography>
+              <TextField
+                label='お題'
+                placeholder='（なし）'
+                value={page.description}
+                onChange={(event) => {
+                  handleUpdateAlbumPageMetaData(
+                    i,
+                    event.target.value,
+                    page.playerName
+                  );
+                }}
+                size='small'
+                fullWidth
+                sx={{ my: theme.spacing(1) }}
+                inputProps={{ style: { fontSize: fontSizeInput } }}
+                InputLabelProps={{ style: { fontSize: fontSizeInput } }}
+              />
+              <TextField
+                label='プレイヤー名'
+                placeholder='（なし）'
+                value={page.playerName}
+                onChange={(event) => {
+                  handleUpdateAlbumPageMetaData(
+                    i,
+                    page.description,
+                    event.target.value
+                  );
+                }}
+                size='small'
+                fullWidth
+                inputProps={{ style: { fontSize: fontSizeInput } }}
+                InputLabelProps={{ style: { fontSize: fontSizeInput } }}
+              />
+            </Card>
+          ))}
+        </Box>
+      </Box>
+    );
+  };
+
   return (
     <React.Fragment>
-      <main>
-        <Container
-          maxWidth='lg'
-          sx={{ width: `calc(100% - ${drawerWidth}px)` }}
-        >
+      <main style={{ marginLeft: theme.spacing(8) }}>
+        <Container maxWidth='lg'>
           <Toolbar />
           {isAlbumLoading ? (
             <Box
@@ -353,7 +648,7 @@ const AlbumPage: React.FC = () => {
             <NotFoundPage />
           ) : (
             <React.Fragment>
-              <Box sx={{ display: 'flex', p: '0.3em' }}>
+              <Box sx={{ display: 'flex', mt: theme.spacing(2) }}>
                 <Button
                   onClick={() => {
                     navigate('/albums', { replace: true });
@@ -364,9 +659,9 @@ const AlbumPage: React.FC = () => {
                   <Typography fontSize='small'>アルバム一覧</Typography>
                 </Button>
               </Box>
-              <Box sx={{ display: 'flex', mb: '0.6em' }}>
+              <Box sx={{ display: 'flex', mb: theme.spacing(1) }}>
                 <Box sx={{ flexGrow: 1, width: '50%' }}>
-                  <Typography variant='h5'>
+                  <Typography fontSize={fontSizeTitle}>
                     {formatPlayedAt(new Date(album.playedAt))}
                   </Typography>
                 </Box>
@@ -378,11 +673,13 @@ const AlbumPage: React.FC = () => {
                     sx={{ flexGrow: 1, mx: '0.5em' }}
                   >
                     {album.isBookmarked ? (
-                      <StarIcon />
+                      <StarIcon sx={{ fontSize: fontSizeTitleIcon }} />
                     ) : (
-                      <StarBorderOutlinedIcon />
+                      <StarBorderOutlinedIcon
+                        sx={{ fontSize: fontSizeTitleIcon }}
+                      />
                     )}
-                    ブックマーク
+                    {!isSp && 'ブックマーク'}
                   </Button>
                   <Button
                     size='small'
@@ -390,280 +687,30 @@ const AlbumPage: React.FC = () => {
                     onClick={handlePressDownload}
                     sx={{ flexGrow: 1, mx: '0.5em' }}
                   >
-                    <DownloadIcon />
-                    ダウンロード
+                    <DownloadIcon sx={{ fontSize: fontSizeTitleIcon }} />
+                    {!isSp && 'ダウンロード'}
                   </Button>
                 </Box>
               </Box>
               <Divider />
-              <Box
-                sx={{
-                  my: '0.6em',
-                  display: 'flex',
-                  height: 'calc(100vh - 200px)',
-                }}
-              >
+              {isSp && imageBox(album)}
+              {isSp ? (
+                <React.Fragment>
+                  {albumInfoLeft(album)}
+                  {albumInfoRight(album)}
+                </React.Fragment>
+              ) : (
                 <Box
                   sx={{
-                    flexGrow: 1,
-                    width: '50%',
-                    height: '100%',
-                    pr: '0.3em',
-                    overflowY: 'auto',
+                    my: '0.6em',
+                    display: 'flex',
+                    height: isSp ? 'auto' : 'calc(100vh - 200px)',
                   }}
                 >
-                  <Box
-                    component='img'
-                    src={album.source}
-                    alt='album animation'
-                    style={{
-                      display: 'block',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'scale-down',
-                      pointerEvents: 'none',
-                      marginBottom: '0.2em',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      mx: '2em',
-                      my: '0.2em',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <BootstrapTooltip title='表示回数'>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <VisibilityIcon
-                          fontSize='medium'
-                          sx={{ mr: '0.2em', flexGrow: 1 }}
-                        />
-                        <Typography variant='h6' sx={{ flexGrow: 3 }}>
-                          {String(album.pvCount)}
-                        </Typography>
-                      </Box>
-                    </BootstrapTooltip>
-                    <BootstrapTooltip title='ブックマーク数'>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <StarIcon
-                          fontSize='medium'
-                          sx={{ mr: '0.2em', flexGrow: 1 }}
-                        />
-                        <Typography variant='h6' sx={{ flexGrow: 3 }}>
-                          {String(album.bookmarkCount)}
-                        </Typography>
-                      </Box>
-                    </BootstrapTooltip>
-                    <BootstrapTooltip title='ダウンロード回数'>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <DownloadIcon
-                          fontSize='medium'
-                          sx={{ mr: '0.2em', flexGrow: 1 }}
-                        />
-                        <Typography variant='h6' sx={{ flexGrow: 3 }}>
-                          {String(album.downloadCount)}
-                        </Typography>
-                      </Box>
-                    </BootstrapTooltip>
-                  </Box>
-                  <Box
-                    sx={{
-                      my: '0.2em',
-                    }}
-                  >
-                    <Typography variant='subtitle1'>ゲームモード</Typography>
-                    <Box
-                      sx={{
-                        mx: '2em',
-                        display: 'flex',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <FormControl
-                        size='small'
-                        sx={{ width: '100%', maxWidth: 320 }}
-                      >
-                        <Select
-                          value={album.gamemodeId}
-                          fullWidth
-                          onChange={(event) => {
-                            handleUpdateAlbumGamemodeId(
-                              Number(event.target.value)
-                            );
-                          }}
-                        >
-                          {gamemodeList.map((gamemode, i) => (
-                            <MenuItem
-                              value={gamemode.id}
-                              key={String(gamemode.id)}
-                            >
-                              {gamemode.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                    <Box
-                      sx={{
-                        my: '0.2em',
-                        width: '100%',
-                      }}
-                    >
-                      <Typography variant='subtitle1'>タグ</Typography>
-                      <Box
-                        sx={{
-                          mx: '2em',
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        {album.tags.map((tag) => (
-                          <Box
-                            key={tag.name}
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              mr: '0.4em',
-                            }}
-                          >
-                            <Button
-                              variant='contained'
-                              size='small'
-                              onClick={() => {
-                                handleClickExistingTag(tag.name);
-                              }}
-                              sx={{
-                                borderRadius: 100,
-                                m: '0.1em',
-                                textTransform: 'none',
-                              }}
-                            >
-                              {tag.name}
-                            </Button>
-                            <IconButton
-                              size='small'
-                              onClick={() => {
-                                handleDeleteExistingTag(tag.id);
-                              }}
-                            >
-                              <CloseIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
-                          </Box>
-                        ))}
-                      </Box>
-                      <Box sx={{ my: '0.3em', float: 'right' }}>
-                        {album.tags.length < 10 && (
-                          <Button
-                            variant='contained'
-                            size='small'
-                            sx={{ display: 'flex', alignItems: 'center' }}
-                            onClick={() => {
-                              setOpenAddTagDialog(true);
-                            }}
-                          >
-                            <AddIcon sx={{ fontSize: 16 }} />
-                            タグを追加…
-                          </Button>
-                        )}
-                      </Box>
-                    </Box>
-                  </Box>
+                  {albumInfoLeft(album)}
+                  {albumInfoRight(album)}
                 </Box>
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    width: '50%',
-                    height: '100%',
-                    pl: '0.6em',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 40,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      pb: '0.6em',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Typography variant='subtitle1'>ページ情報</Typography>
-                    </Box>
-                    <Button
-                      size='small'
-                      variant='contained'
-                      onClick={handleSaveAlbumPageMetaData}
-                    >
-                      {isAlbumUpdateLoading ? (
-                        <CircularProgress
-                          size='1.5em'
-                          sx={{ color: 'white' }}
-                        />
-                      ) : (
-                        '保存'
-                      )}
-                    </Button>
-                  </Box>
-                  <Box
-                    sx={{
-                      height: 'calc(100% - 40px)',
-                      overflowY: 'scroll',
-                    }}
-                  >
-                    {album.pageMetaData.map((page, i) => (
-                      <Card
-                        variant='outlined'
-                        key={i}
-                        sx={{
-                          m: '1em',
-                          mt: i === 0 ? 0 : '1em',
-                          mb: i === album.pageMetaData.length - 1 ? 0 : '1em',
-                          p: '0.5em',
-                        }}
-                      >
-                        <Typography variant='body2'>
-                          {'Page ' + String(i + 1)}
-                        </Typography>
-                        <TextField
-                          label='お題'
-                          placeholder='（なし）'
-                          value={page.description}
-                          onChange={(event) => {
-                            handleUpdateAlbumPageMetaData(
-                              i,
-                              event.target.value,
-                              page.playerName
-                            );
-                          }}
-                          size='small'
-                          fullWidth
-                          sx={{ my: '0.7em' }}
-                        />
-                        <TextField
-                          label='プレイヤー名'
-                          placeholder='（なし）'
-                          value={page.playerName}
-                          onChange={(event) => {
-                            handleUpdateAlbumPageMetaData(
-                              i,
-                              page.description,
-                              event.target.value
-                            );
-                          }}
-                          size='small'
-                          fullWidth
-                        />
-                      </Card>
-                    ))}
-                  </Box>
-                </Box>
-              </Box>
+              )}
             </React.Fragment>
           )}
         </Container>

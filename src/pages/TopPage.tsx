@@ -15,6 +15,7 @@ import {
   Select,
   SelectChangeEvent,
   Toolbar,
+  useTheme,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -35,7 +36,6 @@ import {
 } from '../services/Albums';
 import { ARS } from '../functionalities/ApiResponseStatus';
 import { AlbumCard } from '../components/AlbumCard';
-import { drawerWidth } from '../components/Drawer';
 import AlbumFilterDialog, {
   AlbumFilter,
 } from '../components/AlbumFilterDialog';
@@ -43,6 +43,7 @@ import { Gamemode, getGamemodes } from '../services/Gamemodes';
 import { dateToGpName } from '../functionalities/Utils';
 import AlbumUploadDialog from '../components/AlbumUploadDialog';
 import { version } from '../version';
+import { mediaQuery, useMediaQuery } from '../functionalities/MediaQuery';
 
 const albumsPerPage = 12;
 
@@ -132,6 +133,14 @@ const TopPage: React.FC = () => {
 
   const authInfo = useAuthInfo();
   const setAuthInfo = useSetAuthInfo();
+
+  const theme = useTheme();
+
+  // responsive
+  const isSp = useMediaQuery(mediaQuery.sp);
+  const fontSizeMain = isSp ? 12 : 16;
+  const fontSizeMainIcon = fontSizeMain * 1.5;
+  const fontSizeSub = isSp ? 9 : 12;
 
   const handleCloseFilterDialog = () => {
     setOpenFilterDialog(false);
@@ -399,11 +408,8 @@ const TopPage: React.FC = () => {
 
   return (
     <React.Fragment>
-      <main>
-        <Container
-          maxWidth='md'
-          sx={{ width: `calc(100% - ${drawerWidth}px)` }}
-        >
+      <main style={{ marginLeft: theme.spacing(8) }}>
+        <Container maxWidth='md'>
           <Toolbar />
           <Box sx={{ display: 'flex', py: '1em', height: 80 }}>
             <Box sx={{ width: '40%', display: 'flex' }}>
@@ -411,7 +417,12 @@ const TopPage: React.FC = () => {
                 onClick={() => {
                   setOpenFilterDialog(true);
                 }}
-                sx={{ width: 40, height: 40, my: 'auto' }}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  my: 'auto',
+                  fontSize: fontSizeMainIcon,
+                }}
               >
                 <Badge
                   badgeContent={
@@ -424,17 +435,19 @@ const TopPage: React.FC = () => {
                   }
                   color='primary'
                 >
-                  <FilterListIcon />
+                  <FilterListIcon fontSize='inherit' />
                 </Badge>
               </IconButton>
-              <Typography sx={{ my: 'auto' }}>フィルタ</Typography>
+              <Typography fontSize={fontSizeMain} sx={{ my: 'auto' }}>
+                フィルタ
+              </Typography>
             </Box>
             <Box sx={{ width: '60%', display: 'flex' }}>
               <FormControl sx={{ width: '50%' }}>
                 <Select
                   value={String(sortModeIndex)}
                   onChange={handleSelectSortMode}
-                  sx={{ height: '100%' }}
+                  sx={{ height: '100%', fontSize: fontSizeMain }}
                 >
                   {sortModeList.map((sortMode, i) => (
                     <MenuItem value={String(i)} key={String(i)}>
@@ -449,10 +462,16 @@ const TopPage: React.FC = () => {
                 onClick={() => {
                   setOpenUploadDialog(true);
                 }}
-                sx={{ width: '45%' }}
+                sx={{ width: '45%', fontSize: fontSizeMain }}
               >
-                <UploadIcon color='inherit' />
-                アップロード
+                <UploadIcon
+                  color='inherit'
+                  sx={{
+                    mr: isSp ? 0 : theme.spacing(1),
+                    fontSize: fontSizeMainIcon,
+                  }}
+                />
+                {!isSp && 'アップロード'}
               </Button>
             </Box>
           </Box>
@@ -489,16 +508,23 @@ const TopPage: React.FC = () => {
             <React.Fragment>
               <Box sx={{ height: '0.5em' }} />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box sx={{ minWidth: '50%' }} />
                 <Pagination
                   count={Math.ceil(albumsTotalCount / albumsPerPage)}
                   page={page + 1}
                   onChange={handleSelectPage}
+                  size={isSp ? 'small' : 'medium'}
+                  sx={{ ml: 'auto' }}
                 />
               </Box>
-              <Grid container spacing={4} sx={{ py: '1em' }}>
+              <Grid container spacing={isSp ? 2 : 4} sx={{ py: '1em' }}>
                 {albums.map((album) => (
-                  <Grid item key={album.thumbSource} xs={8} sm={4} md={3}>
+                  <Grid
+                    item
+                    key={album.thumbSource}
+                    xs={isSp ? 4 : 8}
+                    sm={4}
+                    md={3}
+                  >
                     <AlbumCard
                       albumId={album.id}
                       thumbSource={album.thumbSource}
@@ -514,22 +540,23 @@ const TopPage: React.FC = () => {
                 ))}
               </Grid>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box sx={{ minWidth: '50%' }} />
                 <Pagination
                   count={Math.ceil(albumsTotalCount / albumsPerPage)}
                   page={page + 1}
                   onChange={handleSelectPage}
+                  size={isSp ? 'small' : 'medium'}
+                  sx={{ ml: 'auto' }}
                 />
               </Box>
             </React.Fragment>
           )}
         </Container>
         <Box sx={{ bgcolor: 'background.paper', p: 6 }} component='footer'>
-          <Typography variant='h6' align='center' gutterBottom>
+          <Typography fontSize={fontSizeMain * 1.2} align='center' gutterBottom>
             {'Purple Archive ' + version}
           </Typography>
           <Typography
-            variant='subtitle1'
+            fontSize={fontSizeSub * 1.2}
             align='center'
             color='text.secondary'
             component='p'

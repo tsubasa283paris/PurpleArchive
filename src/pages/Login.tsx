@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { AuthContext, Login } from '../functionalities/AuthContext';
 import { ARS } from '../functionalities/ApiResponseStatus';
+import { mediaQuery, useMediaQuery } from '../functionalities/MediaQuery';
 
 const LoginPage: React.FC<{}> = () => {
   const [username, setUsername] = React.useState<string>('');
@@ -23,6 +24,9 @@ const LoginPage: React.FC<{}> = () => {
   const [openSnackbar, setOpenSnackbar] = React.useState<boolean>(false);
 
   const setAuthInfo = React.useContext(AuthContext).setAuthInfo;
+
+  // responsive
+  const isSp = useMediaQuery(mediaQuery.sp);
 
   const stopProgressBecauseOfError = (text: string) => {
     setIsLoginInProgress(false);
@@ -86,7 +90,7 @@ const LoginPage: React.FC<{}> = () => {
     <Container>
       <Card
         sx={{
-          width: '30em',
+          width: isSp ? '20em' : '30em',
           padding: '3em',
           display: 'block',
           marginLeft: 'auto',

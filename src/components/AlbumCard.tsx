@@ -1,11 +1,12 @@
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
+  IconButton,
   Typography,
+  useTheme,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import StarIcon from '@mui/icons-material/Star';
@@ -15,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { formatPlayedAt } from '../functionalities/Utils';
 import { BootstrapTooltip } from './Tooltip';
+import { mediaQuery, useMediaQuery } from '../functionalities/MediaQuery';
 
 interface AlbumCardProps {
   albumId: number;
@@ -30,6 +32,14 @@ interface AlbumCardProps {
 
 export const AlbumCard = (props: AlbumCardProps) => {
   const navigate = useNavigate();
+
+  const theme = useTheme();
+
+  const isSp = useMediaQuery(mediaQuery.sp);
+  const fontSizeMain = isSp ? 14 : 16;
+  const fontSizeMainIcon = fontSizeMain * 1.2;
+  const fontSizeButtonIcon = isSp ? 15 : 20;
+  const littlePadding = isSp ? theme.spacing(0.5) : theme.spacing(1);
 
   const navigateToAlbum = () => {
     navigate(`/albums/${props.albumId}`, { replace: true });
@@ -55,71 +65,87 @@ export const AlbumCard = (props: AlbumCardProps) => {
       />
       <CardContent
         sx={{
-          padding: '0.5em',
+          padding: littlePadding,
           display: 'flex',
           justifyContent: 'space-between',
           flexDirection: 'column',
         }}
       >
-        <Typography variant='body1'>
+        <Typography fontSize={fontSizeMain}>
           {formatPlayedAt(new Date(props.playedAt))}
         </Typography>
         <Box sx={{ height: '0.3em' }} />
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
             <VisibilityIcon
-              fontSize='small'
-              sx={{ mt: '0.1em', flexGrow: 1 }}
+              sx={{ mt: '0.1em', flexGrow: 1, fontSize: fontSizeMainIcon }}
             />
-            <Typography variant='body1' sx={{ flexGrow: 3 }}>
+            <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
               {String(props.pvCount)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <StarIcon fontSize='small' sx={{ mt: '0.1em', flexGrow: 1 }} />
-            <Typography variant='body1' sx={{ flexGrow: 3 }}>
+            <StarIcon
+              sx={{ mt: '0.1em', flexGrow: 1, fontSize: fontSizeMainIcon }}
+            />
+            <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
               {String(props.bookmarkCount)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <DownloadIcon fontSize='small' sx={{ mt: '0.1em', flexGrow: 1 }} />
-            <Typography variant='body1' sx={{ flexGrow: 3 }}>
+            <DownloadIcon
+              sx={{ mt: '0.1em', flexGrow: 1, fontSize: fontSizeMainIcon }}
+            />
+            <Typography fontSize={fontSizeMain} sx={{ flexGrow: 3 }}>
               {String(props.downloadCount)}
             </Typography>
           </Box>
         </Box>
       </CardContent>
       <CardActions
-        sx={{ display: 'flex', borderTop: 1, borderColor: 'grey.300' }}
+        sx={{
+          display: 'flex',
+          borderTop: 1,
+          borderColor: 'grey.300',
+          padding: littlePadding,
+        }}
       >
-        <BootstrapTooltip
-          title={
-            props.isBookmarked ? 'ブックマークを解除' : 'ブックマークに追加'
-          }
-        >
-          <Button
-            size='small'
-            aria-label='add to bookmark'
-            onClick={() => {
-              props.handlePressBookmark(props.albumId, props.isBookmarked);
-            }}
-            sx={{ flexGrow: 1 }}
+        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+          <BootstrapTooltip
+            title={
+              props.isBookmarked ? 'ブックマークを解除' : 'ブックマークに追加'
+            }
           >
-            {props.isBookmarked ? <StarIcon /> : <StarBorderOutlinedIcon />}
-          </Button>
-        </BootstrapTooltip>
-        <BootstrapTooltip title='ダウンロード'>
-          <Button
-            size='small'
-            aria-label='download'
-            onClick={() => {
-              props.handlePressDownload(props.albumId);
-            }}
-            sx={{ flexGrow: 1 }}
-          >
-            <DownloadIcon />
-          </Button>
-        </BootstrapTooltip>
+            <IconButton
+              size='small'
+              aria-label='add to bookmark'
+              color='primary'
+              onClick={() => {
+                props.handlePressBookmark(props.albumId, props.isBookmarked);
+              }}
+            >
+              {props.isBookmarked ? (
+                <StarIcon sx={{ fontSize: fontSizeButtonIcon }} />
+              ) : (
+                <StarBorderOutlinedIcon sx={{ fontSize: fontSizeButtonIcon }} />
+              )}
+            </IconButton>
+          </BootstrapTooltip>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+          <BootstrapTooltip title='ダウンロード'>
+            <IconButton
+              size='small'
+              aria-label='download'
+              color='primary'
+              onClick={() => {
+                props.handlePressDownload(props.albumId);
+              }}
+            >
+              <DownloadIcon sx={{ fontSize: fontSizeButtonIcon }} />
+            </IconButton>
+          </BootstrapTooltip>
+        </Box>
       </CardActions>
     </Card>
   );
